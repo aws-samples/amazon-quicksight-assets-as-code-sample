@@ -1,11 +1,10 @@
-## My Project
+## QuickSight Assets as Code
 
-TODO: Fill this README out!
+The new Amazon QuickSight Assets as Code feature unlocks capabilities for developers.
 
-Be sure to:
+In this code sample, you can learn how to easily configure dashboard resources by code.
 
-* Change the title in this README
-* Edit your repository description on GitHub
+Note: This code sample is not comprehensive of all QuickSight resources and visual types, and simply showcases some of the possibilities.
 
 ## Security
 
