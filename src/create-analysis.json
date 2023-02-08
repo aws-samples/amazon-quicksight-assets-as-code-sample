@@ -1,0 +1,256 @@
+{
+      "AwsAccountId": "752669751623",
+      "AnalysisId": "test12333",
+      "Name": "test-analysis-123334",
+      "Definition": {
+            "DataSetIdentifierDeclarations": [
+                  {
+                        "DataSetArn": "arn:aws:quicksight:us-east-1:752669751623:dataset/4152f9d8-c75c-4d0f-805c-ebd12fcaf77d",
+                        "Identifier": "AnyCompany Data Set (Company).xlsx"
+                  }
+            ],
+            "ParameterDeclarations": [
+                  {
+                        "DateTimeParameterDeclaration": {
+                              "Name": "Date",
+                              "DefaultValues": {
+                                    "StaticValues": [
+                                          "2017/01/01"
+                                    ]
+                              },
+                              "TimeGranularity": "DAY"
+                        }
+                  },
+                  {
+                        "IntegerParameterDeclaration": {
+                              "Name": "digit",
+                              "ParameterValueType": "MULTI_VALUED"
+                        }
+                  }
+            ],
+            "Sheets": [
+                  {
+                        "SheetId": "sheetid1234",
+                        "Description": "This is a sheet about sales",
+                        "Name": "sales",
+                        "ParameterControls": [
+                              {
+                                    "DateTimePicker": {
+                                          "ParameterControlId": "id1234",
+                                          "SourceParameterName": "Date",
+                                          "Title": "Date",
+                                          "DisplayOptions": {
+                                                "TitleOptions": {
+                                                      "FontConfiguration": {
+                                                            "FontDecoration": "UNDERLINE"
+                                                      }
+                                                }
+                                          }
+                                    }
+                              },
+                              {
+                                    "Dropdown": {
+                                          "ParameterControlId": "112312",
+                                          "SourceParameterName": "digit",
+                                          "Title": "Number"
+                                    }
+                              }
+                        ],
+                        "Title": "Sales Dashboard",
+                        "Visuals": [
+                              {
+                                    "BarChartVisual": {
+                                          "VisualId": "123456789",
+                                          "ChartConfiguration": {
+                                                "FieldWells": {
+                                                      "BarChartAggregatedFieldWells": {
+                                                            "Category": [
+                                                                  {
+                                                                        "CategoricalDimensionField": {
+                                                                              "FieldId": "AnyCompany Data Set (Company).xlsxCompany",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Company",
+                                                                                    "DataSetIdentifier": "AnyCompany Data Set (Company).xlsx"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ],
+                                                            "Values": [
+                                                                  {
+                                                                        "NumericalMeasureField": {
+                                                                              "FieldId": "AnyCompany Data Set (Company).xlsxOrder #",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Order #",
+                                                                                    "DataSetIdentifier": "AnyCompany Data Set (Company).xlsx"
+                                                                              },
+                                                                              "AggregationFunction": {
+                                                                                    "SimpleNumericalAggregation": "SUM"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ]
+                                                      }
+                                                },
+                                                "BarsArrangement": "CLUSTERED",
+                                                "Orientation": "VERTICAL"
+                                          },
+                                          "Title": {
+                                                "Visibility": "VISIBLE",
+                                                "FormatText": {
+                                                      "PlainText": "This is my title"
+                                                }
+                                          },
+                                          "Subtitle": {
+                                                "Visibility": "VISIBLE",
+                                                "FormatText": {
+                                                      "PlainText": "This is my subtitle"
+                                                }
+                                          }
+                                    }
+                              },
+                              {
+                                    "BarChartVisual": {
+                                          "VisualId": "232424",
+                                          "ChartConfiguration": {
+                                                "FieldWells": {
+                                                      "BarChartAggregatedFieldWells": {
+                                                            "Category": [
+                                                                  {
+                                                                        "CategoricalDimensionField": {
+                                                                              "FieldId": "AnyCompany Data Set (Company).xlsxCompany",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Company",
+                                                                                    "DataSetIdentifier": "AnyCompany Data Set (Company).xlsx"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ],
+                                                            "Values": [
+                                                                  {
+                                                                        "NumericalMeasureField": {
+                                                                              "FieldId": "AnyCompany Data Set (Company).xlsxOrder #",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Order #",
+                                                                                    "DataSetIdentifier": "AnyCompany Data Set (Company).xlsx"
+                                                                              },
+                                                                              "AggregationFunction": {
+                                                                                    "SimpleNumericalAggregation": "AVERAGE"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ]
+                                                      }
+                                                },
+                                                "BarsArrangement": "STACKED",
+                                                "Orientation": "HORIZONTAL"
+                                          }
+                                    }
+                              }
+                        ]
+                  },
+                  {
+                        "SheetId": "sheetid321",
+                        "Name": "costs",
+                        "Visuals": [
+                              {
+                                    "BarChartVisual": {
+                                          "VisualId": "23409",
+                                          "ChartConfiguration": {
+                                                "FieldWells": {
+                                                      "BarChartAggregatedFieldWells": {
+                                                            "Category": [
+                                                                  {
+                                                                        "CategoricalDimensionField": {
+                                                                              "FieldId": "AnyCompany Data Set (Company).xlsxCompany",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Company",
+                                                                                    "DataSetIdentifier": "AnyCompany Data Set (Company).xlsx"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ],
+                                                            "Values": [
+                                                                  {
+                                                                        "NumericalMeasureField": {
+                                                                              "FieldId": "AnyCompany Data Set (Company).xlsxOrder #",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Order #",
+                                                                                    "DataSetIdentifier": "AnyCompany Data Set (Company).xlsx"
+                                                                              },
+                                                                              "AggregationFunction": {
+                                                                                    "SimpleNumericalAggregation": "SUM"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ]
+                                                      }
+                                                },
+                                                "BarsArrangement": "STACKED",
+                                                "Orientation": "HORIZONTAL"
+                                          }
+                                    }
+                              },
+                              {
+                                    "LineChartVisual": {
+                                          "VisualId": "234239",
+                                          "ChartConfiguration": {
+                                                "FieldWells": {
+                                                      "LineChartAggregatedFieldWells": {
+                                                            "Category": [
+                                                                  {
+                                                                        "CategoricalDimensionField": {
+                                                                              "FieldId": "AnyCompany Data Set (Company).xlsxCompany",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Company",
+                                                                                    "DataSetIdentifier": "AnyCompany Data Set (Company).xlsx"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ],
+                                                            "Values": [
+                                                                  {
+                                                                        "NumericalMeasureField": {
+                                                                              "FieldId": "AnyCompany Data Set (Company).xlsxOrder #",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Order #",
+                                                                                    "DataSetIdentifier": "AnyCompany Data Set (Company).xlsx"
+                                                                              },
+                                                                              "AggregationFunction": {
+                                                                                    "SimpleNumericalAggregation": "SUM"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ]
+                                                      }
+                                                },
+                                                "Type": "LINE"
+                                          }
+                                    }
+                              },
+                              {
+                                    "TableVisual": {
+                                          "VisualId": "iolewhtli",
+                                          "ChartConfiguration": {
+                                                "FieldWells": {
+                                                      "TableAggregatedFieldWells": {
+                                                            "GroupBy": [
+                                                                  {
+                                                                        "CategoricalDimensionField": {
+                                                                              "FieldId": "AnyCompany Data Set (Company).xlsxCompany",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Company",
+                                                                                    "DataSetIdentifier": "AnyCompany Data Set (Company).xlsx"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ]
+                                                      }
+                                                }
+                                          }
+                                    }
+                              }
+                        ]
+                  }
+            ]
+      }
+}
