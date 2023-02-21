@@ -16,8 +16,23 @@ linechart_1.set_type('LINE')
 
 linechart_1.add_date_dimension_field('Order Date','SaaS-Sales.csv', date_granularity = "MONTH")
 ```
-Note: This code sample is not comprehensive of all QuickSight resources and visual types, and simply showcases potential capabilities.
+*Note: This code sample is not comprehensive of all QuickSight resources and visual types, and simply showcases potential capabilities.*
 
+## How it works
+
+The repo contains three main constructs - 1) quicksight_assets_class.py, 2) create-analysis.py, and 3) asset-definition.json.
+
+1. quicksight_assets_class.py
+    - This is the python code that wraps QuickSight JSON objects into Python Classes.
+2. create-analysis.py
+    - This is the part where you define dashboard objects you want to create, including parameters, calculated fields, visuals, etc.
+    - Once you define all the resources, the code will also generate a final JSON file that contains the analysis definition.
+3. asset-definition.json
+    - This is the JSON file that will be used in the create-analysis or update-analysis APIs to either create a new analysis or update an existing analysis.
+
+'''
+aws quicksight update-analysis --cli-input-json file://asset-definition.json --region us-east-1 --profile [your-aws-profile-here]
+'''
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
