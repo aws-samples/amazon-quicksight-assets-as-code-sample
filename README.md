@@ -1,5 +1,6 @@
-## QuickSight Assets-as-Code
+# QuickSight Assets-as-Code
 
+## Overview
 Amazon QuickSight Assets-as-Code allow customers and partners to treat BI resources as code assets that sit outside of the QuickSight platform. This unlocks a number of capabilities, including but not limited to use cases such as programmatic dashboard creation, version control, BI workfload migration, and much more.
 
 Currently, these APIs (*DescribeAnalysisDefinition, DescribeTemplateDefinition, DescribeDashboardDefinition*) allow developers to manage all supported charts and visual components in JSON format.
@@ -9,7 +10,7 @@ With complex dashboards with many resources, however, navigating through nested 
 *Note: This code sample is not comprehensive of all QuickSight resources and visual types, and simply showcases potential capabilities.*
 ## Example
 
-# Visuals
+### Visuals
 For example, to create a new Line Chart object, you can simply call the below line of code.
 ```
 linechart_1 = LineChartVisual(visual_id = 'linechart1')
@@ -23,7 +24,7 @@ linechart_1.add_date_dimension_field('Order Date','SaaS-Sales.csv', date_granula
 
 Once you are done defining your resources, the code sample will package all of your resources into a single JSON structure that is acceptable by QuickSight.
 
-# Sheets
+### Sheets
 Similarly, you can create sheets and further configure the sheet.
 ```
 sheet_1 = Sheet('sheet1', name = "AnyCompany Sales")
