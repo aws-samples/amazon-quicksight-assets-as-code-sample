@@ -1,7 +1,7 @@
 {
       "AwsAccountId": "752669751623",
-      "AnalysisId": "test12333",
-      "Name": "test-analysis-123334",
+      "AnalysisId": "analysis1",
+      "Name": "Assets as Code - Sample Analysis",
       "Definition": {
             "DataSetIdentifierDeclarations": [
                   {
@@ -23,10 +23,17 @@
                         "SheetContentType": "INTERACTIVE"
                   }
             },
+            "CalculatedFields": [
+                  {
+                        "DataSetIdentifier": "SaaS-Sales.csv",
+                        "Expression": "{Sales} - {Profit}",
+                        "Name": "Cost"
+                  }
+            ],
             "FilterGroups": [
                   {
                         "CrossDataset": "ALL_DATASETS",
-                        "FilterGroupId": "agasgsgsd",
+                        "FilterGroupId": "filtergroup1",
                         "Filters": [
                               {
                                     "CategoryFilter": {
@@ -53,7 +60,7 @@
                                     "SheetVisualScopingConfigurations": [
                                           {
                                                 "Scope": "ALL_VISUALS",
-                                                "SheetId": "sheetid1234"
+                                                "SheetId": "sheet1"
                                           }
                                     ]
                               }
@@ -62,7 +69,7 @@
                   },
                   {
                         "CrossDataset": "ALL_DATASETS",
-                        "FilterGroupId": "agasgsgs4545d",
+                        "FilterGroupId": "filtergroup2",
                         "Filters": [
                               {
                                     "TimeRangeFilter": {
@@ -83,7 +90,7 @@
                                     "SheetVisualScopingConfigurations": [
                                           {
                                                 "Scope": "ALL_VISUALS",
-                                                "SheetId": "sheetid1234"
+                                                "SheetId": "sheet1"
                                           }
                                     ]
                               }
@@ -112,7 +119,7 @@
             ],
             "Sheets": [
                   {
-                        "SheetId": "sheetid1234",
+                        "SheetId": "sheet1",
                         "Description": "This dashboard shows YTD Sales on AnyCompany Products. All the assets in this dashboard (Visuals, Parameters, Filters, Actions, etc.) were programmatically created using assets-as-code.",
                         "Layouts": [
                               {
@@ -120,7 +127,7 @@
                                           "GridLayout": {
                                                 "Elements": [
                                                       {
-                                                            "ElementId": "123456789",
+                                                            "ElementId": "barchart1",
                                                             "ElementType": "VISUAL",
                                                             "ColumnSpan": 13,
                                                             "RowSpan": 10,
@@ -128,7 +135,7 @@
                                                             "RowIndex": 0
                                                       },
                                                       {
-                                                            "ElementId": "232424",
+                                                            "ElementId": "barchart2",
                                                             "ElementType": "VISUAL",
                                                             "ColumnSpan": 13,
                                                             "RowSpan": 10,
@@ -136,7 +143,7 @@
                                                             "RowIndex": 0
                                                       },
                                                       {
-                                                            "ElementId": "234eet239",
+                                                            "ElementId": "linechart1",
                                                             "ElementType": "VISUAL",
                                                             "ColumnSpan": 13,
                                                             "RowSpan": 10,
@@ -144,7 +151,7 @@
                                                             "RowIndex": 10
                                                       },
                                                       {
-                                                            "ElementId": "iolewhtli",
+                                                            "ElementId": "table1",
                                                             "ElementType": "VISUAL",
                                                             "ColumnSpan": 13,
                                                             "RowSpan": 10,
@@ -191,7 +198,7 @@
                         "Visuals": [
                               {
                                     "BarChartVisual": {
-                                          "VisualId": "123456789",
+                                          "VisualId": "barchart1",
                                           "Actions": [
                                                 {
                                                       "ActionOperations": [
@@ -255,20 +262,20 @@
                                           "Title": {
                                                 "Visibility": "VISIBLE",
                                                 "FormatText": {
-                                                      "PlainText": "Average Profit by Product"
+                                                      "PlainText": "Sum of Sales by Product"
                                                 }
                                           },
                                           "Subtitle": {
                                                 "Visibility": "VISIBLE",
                                                 "FormatText": {
-                                                      "PlainText": "This is my subtitle"
+                                                      "PlainText": "Use this visual to drill down into specific products."
                                                 }
                                           }
                                     }
                               },
                               {
                                     "BarChartVisual": {
-                                          "VisualId": "232424",
+                                          "VisualId": "barchart2",
                                           "ChartConfiguration": {
                                                 "FieldWells": {
                                                       "BarChartAggregatedFieldWells": {
@@ -306,12 +313,18 @@
                                                             "Visibility": "HIDDEN"
                                                       }
                                                 }
+                                          },
+                                          "Title": {
+                                                "Visibility": "VISIBLE",
+                                                "FormatText": {
+                                                      "PlainText": "Average Profit by Product"
+                                                }
                                           }
                                     }
                               },
                               {
                                     "LineChartVisual": {
-                                          "VisualId": "234eet239",
+                                          "VisualId": "linechart1",
                                           "ChartConfiguration": {
                                                 "FieldWells": {
                                                       "LineChartAggregatedFieldWells": {
@@ -351,6 +364,18 @@
                                                                                     "SimpleNumericalAggregation": "SUM"
                                                                               }
                                                                         }
+                                                                  },
+                                                                  {
+                                                                        "NumericalMeasureField": {
+                                                                              "FieldId": "Cost",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Cost",
+                                                                                    "DataSetIdentifier": "SaaS-Sales.csv"
+                                                                              },
+                                                                              "AggregationFunction": {
+                                                                                    "SimpleNumericalAggregation": "SUM"
+                                                                              }
+                                                                        }
                                                                   }
                                                             ]
                                                       }
@@ -372,7 +397,7 @@
                               },
                               {
                                     "TableVisual": {
-                                          "VisualId": "iolewhtli",
+                                          "VisualId": "table1",
                                           "ChartConfiguration": {
                                                 "FieldWells": {
                                                       "TableAggregatedFieldWells": {
@@ -482,14 +507,14 @@
                         ]
                   },
                   {
-                        "SheetId": "sheetid321",
+                        "SheetId": "sheet2",
                         "Layouts": [
                               {
                                     "Configuration": {
                                           "FreeFormLayout": {
                                                 "Elements": [
                                                       {
-                                                            "ElementId": "234239",
+                                                            "ElementId": "linechart3",
                                                             "ElementType": "VISUAL",
                                                             "Height": "800px",
                                                             "Width": "600px",
@@ -497,7 +522,7 @@
                                                             "YAxisLocation": "0px"
                                                       },
                                                       {
-                                                            "ElementId": "23409",
+                                                            "ElementId": "barchart3",
                                                             "ElementType": "VISUAL",
                                                             "Height": "600px",
                                                             "Width": "600px",
@@ -513,7 +538,7 @@
                         "Visuals": [
                               {
                                     "BarChartVisual": {
-                                          "VisualId": "23409",
+                                          "VisualId": "barchart3",
                                           "ChartConfiguration": {
                                                 "FieldWells": {
                                                       "BarChartAggregatedFieldWells": {
@@ -551,7 +576,7 @@
                               },
                               {
                                     "LineChartVisual": {
-                                          "VisualId": "234239",
+                                          "VisualId": "linechart3",
                                           "ChartConfiguration": {
                                                 "FieldWells": {
                                                       "LineChartAggregatedFieldWells": {

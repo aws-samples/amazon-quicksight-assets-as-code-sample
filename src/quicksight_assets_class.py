@@ -52,6 +52,13 @@ class Definition():
 		for sheet in sheet_list:
 			self.add_sheet(sheet)
 
+	def add_calculated_field(self, calculated_field):
+		self.calculated_fields.append(calculated_field.compile())
+
+	def add_calculated_fields(self, calculated_field_list):
+		for calculated_field in calculated_field_list:
+			self.add_calculated_field(calculated_field)
+
 	def add_parameter(self, parameter):
 		self.parameter_declarations.append(parameter.compile())
 
@@ -255,6 +262,22 @@ class Sheet():
 
 		return clean_dict(self.json)
 
+### CALCULATED FIELDS ###
+class CalculatedField():
+	def __init__(self, data_set_identifier, expression, name):
+		self.data_set_identifier = data_set_identifier
+		self.expression = expression
+		self.name = name
+
+	def compile(self):
+		self.json = {
+			"DataSetIdentifier": self.data_set_identifier,
+			"Expression": self.expression,
+			"Name": self.name
+		}
+
+		return clean_dict(self.json)
+	
 ### PARAMETERS ###
 class Parameter():
 	def __init__(self, name):
@@ -270,7 +293,7 @@ class Parameter():
 		}
 
 	# TODO: NEEDS UPDATE
-	def set_dynamic_default_value(self, column_name, data_set_identifier ):
+	def set_dynamic_default_value(self, column_name, data_set_identifier):
 		self.default_value = {
 			"DynamicValue": {
 				"DefaultValueColumn": {
@@ -1030,7 +1053,6 @@ class Visual():
 			"Trigger": trigger,
 			"Status": status
 		})
-
 class BarChartVisual(Visual):
 	def __init__(self, visual_id):
 		Visual.__init__(self, visual_id)
@@ -1203,13 +1225,84 @@ class TableVisual(Visual):
 						"RowSort": self.field_sort
 					}
 				},
+				"ConditionalFormatting": {
+					"ConditionalFormattingOptions": {
+						"Cell": {
+							"FieldId": "",
+							"TextFormat": {
+								"BackgroundColor": {
+									"Gradient": {
+										"Color": {
+											"Stops": []
+										},
+										"Expression": ""
+									},
+									"Solid": {
+										"Color": "",
+										"Expression": ""
+									}
+								},
+								"Icon": {
+									"CustomCondition": {
+										"Color": "",
+										"Expression": "",
+										"IconOptions": {
+											"Icon": "",
+											"UnicodeIcon": ""
+										},
+										"DisplayConfiguration": {
+											"IconDisplayOption": ""
+										}
+									}
+								},
+								"TextColor": {
+									"Gradient": {
+										"Color": {
+											"Stops": []
+										},
+										"Expression": ""
+									},
+									"Solid": {
+										"Color": "",
+										"Expression": ""
+									}
+								}
+							}
+						},
+						"Row": {
+							"BackgroundColor": {
+								"Gradient": {
+									"Color": {
+										"Stops": []
+									},
+									"Expression": ""
+								},
+								"Solid": {
+									"Color": "",
+									"Expression": ""
+								}
+							},
+							"TextColor": {
+								"Gradient": {
+									"Color": {
+										"Stops": []
+									},
+									"Expression": ""
+								},
+								"Solid": {
+									"Color": "",
+									"Expression": ""
+								}
+							}
+						}
+					}
+				},
 				"Title": self.title,
 				"subtitle": self.subtitle
 			}
 		}
 
 		return clean_dict(self.json)
-
 class PivotTableVisual(Visual):
 	def __init__(self, visual_id):
 		Visual.__init__(self,visual_id)
@@ -1277,7 +1370,7 @@ def clean_dict(input):
 ###################################################################
 
 # Analysis
-analysis_1 = Analysis('752669751623','test12333','test-analysis-123334')
+analysis_1 = Analysis('752669751623','analysis1','Assets as Code - Sample Analysis')
 
 # Analysis Definition
 analysis_definition = Definition([{"DataSetArn":"arn:aws:quicksight:us-east-1:752669751623:dataset/fddb4301-4e9d-458c-bb61-ad68ec168e24","Identifier":"SaaS-Sales.csv"}])
@@ -1299,14 +1392,16 @@ date_filter.add_min_value_parameter(date_parameter_1.name)
 
 # Filter Control
 
+# Calculated Fields
+calculated_field_1 = CalculatedField("SaaS-Sales.csv", "{Sales} - {Profit}", "Cost")
 
 # Sheet
-sheet_1 = Sheet('sheetid1234', name = "AnyCompany Sales")
+sheet_1 = Sheet('sheet1', name = "AnyCompany Sales")
 sheet_1.set_title("AnyCompany Sales")
 sheet_1.set_description("This dashboard shows YTD Sales on AnyCompany Products. All the assets in this dashboard (Visuals, Parameters, Filters, Actions, etc.) were programmatically created using assets-as-code.")
 sheet_1.set_grid_layout("FIXED", "1600px")
 
-sheet_2 = Sheet('sheetid321', name = "costs")
+sheet_2 = Sheet('sheet2', name = "costs")
 sheet_2.set_freeform_layout()
 
 
@@ -1315,7 +1410,7 @@ parameter_date_control_1 = ParameterDateTimePickerControl("id1234", date_paramet
 parameter_date_control_1.set_title_font(font_decoration="UNDERLINE")
 
 # Visuals
-barchart_1 = BarChartVisual('123456789')
+barchart_1 = BarChartVisual('barchart1')
 barchart_1.set_bars_arrangement('CLUSTERED')
 barchart_1.set_orientation('VERTICAL')
 barchart_1.add_categorical_dimension_field('Product','SaaS-Sales.csv')
@@ -1325,35 +1420,36 @@ barchart_1.add_subtitle("VISIBLE","PlainText","Use this visual to drill down int
 barchart_1.set_scroll_bar_visibility("HIDDEN")
 barchart_1.add_filter_action("quick_filter_action_1", "Quick Filter", "DATA_POINT_CLICK", selected_field_options = "ALL_FIELDS", target_visual_options= "ALL_VISUALS")
 
-barchart_2 = BarChartVisual('232424')
+barchart_2 = BarChartVisual('barchart2')
 barchart_2.set_bars_arrangement('STACKED')
 barchart_2.set_orientation('HORIZONTAL')
 barchart_2.add_categorical_dimension_field('Product','SaaS-Sales.csv')
 barchart_2.add_numerical_measure_field('Profit','SaaS-Sales.csv','AVERAGE')
 barchart_2.set_scroll_bar_visibility("HIDDEN")
-barchart_1.add_title("VISIBLE","PlainText","Average Profit by Product")
-barchart_1.add_subtitle("VISIBLE","PlainText","This is my subtitle")
+barchart_2.add_title("VISIBLE","PlainText","Average Profit by Product")
 
-linechart_1 = LineChartVisual('234eet239')
+
+linechart_1 = LineChartVisual('linechart1')
 linechart_1.set_type('LINE')
 linechart_1.add_date_dimension_field('Order Date','SaaS-Sales.csv', date_granularity = "MONTH")
 linechart_1.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
 linechart_1.add_numerical_measure_field('Profit','SaaS-Sales.csv','SUM')
+linechart_1.add_numerical_measure_field('Cost','SaaS-Sales.csv','SUM')
 linechart_1.add_title("VISIBLE","PlainText","Sales vs Profit over time")
 linechart_1.set_scroll_bar_visibility("HIDDEN")
 
-barchart_3 = BarChartVisual('23409')
+barchart_3 = BarChartVisual('barchart3')
 barchart_3.set_bars_arrangement('STACKED')
 barchart_3.set_orientation('HORIZONTAL')
 barchart_3.add_categorical_dimension_field('Product','SaaS-Sales.csv')
 barchart_3.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
 
-linechart_3 = LineChartVisual('234239')
+linechart_3 = LineChartVisual('linechart3')
 linechart_3.set_type('LINE')
 linechart_3.add_categorical_dimension_field('Product','SaaS-Sales.csv')
 linechart_3.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
 
-table_1 = TableVisual('iolewhtli')
+table_1 = TableVisual('table1')
 table_1.add_categorical_dimension_field('Product','SaaS-Sales.csv')
 table_1.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM', currency_symbol="USD")
 table_1.add_numerical_measure_field('Profit','SaaS-Sales.csv','SUM', currency_symbol="USD")
@@ -1364,12 +1460,12 @@ table_1.add_title("VISIBLE","PlainText","Product Metrics Table")
 
 
 # Filter Group
-filter_group_1 = FilterGroup("ALL_DATASETS", "agasgsgsd")
+filter_group_1 = FilterGroup("ALL_DATASETS", "filtergroup1")
 filter_group_1.add_scope_configuration("ALL_VISUALS", sheet_1.id)
 filter_group_1.add_filters([product_filter])
 filter_group_1.set_status("ENABLED")
 
-filter_group_2 = FilterGroup("ALL_DATASETS", "agasgsgs4545d")
+filter_group_2 = FilterGroup("ALL_DATASETS", "filtergroup2")
 filter_group_2.add_scope_configuration("ALL_VISUALS", sheet_1.id)
 filter_group_2.add_filters([date_filter])
 filter_group_2.set_status("ENABLED")
@@ -1394,6 +1490,7 @@ sheet_2.add_freeform_layout_element(barchart_3, "600px","600px","0px","800px")
 analysis_definition.add_sheets([sheet_1,sheet_2])
 analysis_definition.add_parameters([date_parameter_1, integer_parameter_1])
 analysis_definition.add_filter_groups([filter_group_1, filter_group_2])
+analysis_definition.add_calculated_fields([calculated_field_1])
 
 # Next, add the analysis definition object to the analysis object
 analysis_1.add_definition(analysis_definition)
