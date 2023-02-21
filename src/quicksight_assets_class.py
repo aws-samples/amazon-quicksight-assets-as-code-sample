@@ -35,7 +35,6 @@ class Analysis():
 		}
 
 		return json.dumps(clean_dict(self.json),indent = 6)
-
 class Definition():
 	def __init__(self, data_set_definition):
 		self.data_set_definition = data_set_definition
@@ -60,6 +59,41 @@ class Definition():
 		for parameter in parameter_list:
 			self.add_parameter(parameter)
 
+	def add_filter_group(self, filter_group):
+		self.filter_groups.append(filter_group.compile())
+
+	def add_filter_groups(self, filter_group_list):
+		for filter_group in filter_group_list:
+			self.add_filter_group(filter_group)
+
+	def set_analysis_default(self):
+		self.analysis_defaults = {
+
+				"DefaultNewSheetConfiguration": {
+					"InteractiveLayoutConfiguration": {
+						"FreeForm": {
+							"CanvasSizeOptions": {
+								"ScreenCanvasSizeOptions": {
+									"OptimizedViewPortWidth": "1600px"
+								}
+							}
+						}
+						# "Grid": {
+						# 	"CanvasSizeOptions": {
+						# 		"ScreenCanvasSizeOptions": {
+						# 			"ResizeOption": "FIXED",
+						# 			"OptimizedViewPortWidth": "1600px"
+						# 		}
+						# 	}
+						# }
+					},
+					"PaginatedLayoutConfiguration": {
+
+					},
+					"SheetContentType": "INTERACTIVE"
+				}
+			}
+	
 	def compile(self):
 		self.json = {
 		    "DataSetIdentifierDeclarations": self.data_set_definition,
@@ -76,7 +110,7 @@ class Definition():
 ### SHEET ###
 class Sheet():
 	def __init__(self, sheet_id, name):
-		self.sheet_id = sheet_id
+		self.id = sheet_id
 		self.name = name
 		self.title = ""
 		self.description = ""
@@ -100,6 +134,13 @@ class Sheet():
 	def add_parameter_controls(self, parameter_control_list):
 		for parameter_control in parameter_control_list:
 			self.add_parameter_control(parameter_control)
+
+	def add_filter_control(self, filter_control):
+		self.filter_controls.append(filter_control.compile())
+
+	def add_filter_controls(self, filter_control_list):
+		for filter_control in filter_control_list:
+			self.add_filter_control(filter_control)
 
 	def add_text_box(self, text_box):
 		self.text_boxes.append(text_box.compile())
@@ -137,7 +178,7 @@ class Sheet():
 	def add_freeform_layout_element(self, element, height, width, x_axis_location, y_axis_location, background_style = {}, border_style = {}, loading_animation = {}, rendering_rules = {}, selected_border_style = {}, visibility = ""):
 		self.layout["Configuration"]["FreeFormLayout"]["Elements"].append(clean_dict({
 				"ElementId": element.id,
-				"ElementType": element.type,
+				"ElementType": element.element_type,
 				"Height": height,
 				"Width": width,
 				"XAxisLocation": x_axis_location,
@@ -149,20 +190,30 @@ class Sheet():
 				"Visbility": visibility
 			}))
 
-	def set_grid_layout(self):
+	def set_grid_layout(self, resize_option = "", view_port_width = ""):
 		self.layout = {
 				"Configuration": {
 					"GridLayout": {
 						"Elements": [],
 						"CanvasSizeOptions": {
 							"ScreenCanvasSizeOptions":{
-								"ResizeOption": "",
-								"OptimizedViewPortWidth": ""
+								"ResizeOption": resize_option,
+								"OptimizedViewPortWidth": view_port_width
 							}
 						}
 					}
 				}
 			}
+	
+	def add_grid_layout_element(self, element,  x_length, y_length, x_position = "", y_position = ""):
+		self.layout["Configuration"]["GridLayout"]["Elements"].append(clean_dict({
+				"ElementId": element.id,
+				"ElementType": element.element_type,
+				"ColumnSpan": x_length,
+				"RowSpan": y_length,
+				"ColumnIndex": x_position,
+				"RowIndex": y_position
+			}))
 
 	def set_section_based_layout(self):
 		self.layout = {
@@ -189,7 +240,7 @@ class Sheet():
 
 	def compile(self):
 		self.json = {
-			"SheetId": self.sheet_id,
+			"SheetId": self.id,
 			"ContentType": self.content_type,
 			"Description": self.description,
 			"FilterControls": self.filter_controls,
@@ -203,46 +254,6 @@ class Sheet():
 		}
 
 		return clean_dict(self.json)
-
-### LAYOUT ###
-class FreeFormLayout():
-	def __init__(self):
-		self.elements = []
-		self.canvas_size_options = ""
-
-	def add_element(self, element, height, width, x_axis_location, y_axis_location, background_style = {}, border_style = {}, loading_animation = {}, rendering_rules = {}, selected_border_style = {}, visibility = ""):
-		self.elements.append(clean_dict({
-				"ElementId": element.id,
-				"ElementType": element.type,
-				"Height": height,
-				"Width": width,
-				"XAxisLocation": x_axis_location,
-				"YAxisLocation": y_axis_location,
-				"BorderStyle": border_style,
-				"LoadingAnimation": loading_animation,
-				"RenderingRules": rendering_rules,
-				"SelectedBorderStyle": selected_border_style,
-				"Visbility": visibility
-			}))
-
-	def set_canvas_size_options():
-		pass
-
-	def compile(self):
-		self.json = {
-			"Configuration": {
-				"FreeFormLayout": {
-					"Elements": self.elements,
-					"CanvasSizeOptions": {
-						"ScreenCanvasSizeOptions":{
-							"OptimizedViewPortWidth": self.canvas_size_options
-						}
-					}
-				}
-			}
-		}
-		return clean_dict(self.json)
-
 
 ### PARAMETERS ###
 class Parameter():
@@ -276,7 +287,6 @@ class Parameter():
 		self.custom_value = custom_value
 		# RECOMMENDED_VALUE | NULL
 		self.value_when_unset_option = value_when_unset_option
-
 class DateTimeParameter(Parameter):
 	def __init__(self, name):
 		Parameter.__init__(self, name)
@@ -309,7 +319,6 @@ class DateTimeParameter(Parameter):
 		}
 
 		return clean_dict(self.json)
-
 class DecimalParameter(Parameter):
 	def __init__(self, name, parameter_value_type):
 		Parameter.__init__(self, name)
@@ -331,7 +340,6 @@ class DecimalParameter(Parameter):
 		}
 
 		return clean_dict(self.json)
-
 class IntegerParameter(Parameter):
 	def __init__(self, name, parameter_value_type):
 		Parameter.__init__(self, name)
@@ -352,7 +360,6 @@ class IntegerParameter(Parameter):
 			}
 		}
 		return clean_dict(self.json)
-
 class StringParameter(Parameter):
 	def __init__(self, name, parameter_value_type):
 		Parameter.__init__(self, name)
@@ -374,12 +381,12 @@ class StringParameter(Parameter):
 		}
 		return clean_dict(self.json)
 
-
 ### PARAMETER CONTROLS ###
 class ParameterControl():
 	def __init__(self, parameter_control_id, parameter_name, title):
 		# ID of parameter control
-		self.parameter_control_id = parameter_control_id
+		self.id = parameter_control_id
+		self.element_type = "PARAMETER_CONTROL"
 		# Name of source parameter
 		self.source_parameter_name = parameter_name
 		# Title of parameter control
@@ -408,7 +415,7 @@ class ParameterDateTimePickerControl(ParameterControl):
 	def compile(self):
 		self.json = {
 			"DateTimePicker": {
-				"ParameterControlId": self.parameter_control_id,
+				"ParameterControlId": self.id,
 				"SourceParameterName": self.source_parameter_name,
 				"Title": self.title,
 				"DisplayOptions": {
@@ -444,7 +451,7 @@ class ParameterDropDownControl(ParameterControl):
 	def compile(self):
 		self.json = {
 			"Dropdown": {
-				"ParameterControlId": self.parameter_control_id,
+				"ParameterControlId": self.id,
 				"SourceParameterName": self.source_parameter_name,
 				"Title": self.title,
 				"DisplayOptions": {
@@ -491,7 +498,7 @@ class ParameterListControl(ParameterControl):
 	def compile(self):
 		self.json = {
 			"Dropdown": {
-				"ParameterControlId": self.parameter_control_id,
+				"ParameterControlId": self.id,
 				"SourceParameterName": self.source_parameter_name,
 				"Title": self.title,
 				"CascadingControlConfiguration": {					
@@ -543,7 +550,7 @@ class ParameterSliderControl(ParameterControl):
 			"Slider": {
 				"MaximumValue": self.maximum_value,
 				"MinimumValue": self.minimum_value,
-				"ParameterControlId": self.parameter_control_id,
+				"ParameterControlId": self.id,
 				"SourceParameterName": self.source_parameter_name,
 				"StepSize": self.step_size,
 				"Title": self.title,
@@ -576,7 +583,7 @@ class ParameterTextAreaControl(ParameterControl):
 	def compile(self):
 		self.json = {
 			"TextArea": {
-				"ParameterControlId": self.parameter_control_id,
+				"ParameterControlId": self.id,
 				"SourceParameterName": self.source_parameter_name,
 				"Title": self.title,
 				"Delimiter": self.delimiter,
@@ -611,7 +618,7 @@ class ParameterTextFieldControl(ParameterControl):
 	def compile(self):
 		self.json = {
 			"TextArea": {
-				"ParameterControlId": self.parameter_control_id,
+				"ParameterControlId": self.id,
 				"SourceParameterName": self.source_parameter_name,
 				"Title": self.title,
 				"DisplayOptions": {
@@ -639,6 +646,47 @@ class ParameterTextFieldControl(ParameterControl):
 		return clean_dict(self.json)
 
 
+### FILTER GROUP ###
+class FilterGroup():
+	def __init__(self,cross_dataset, filter_group_id):
+		self.id = filter_group_id
+		self.cross_dataset = cross_dataset
+		self.filters = []
+		self.sheet_visual_scoping_configurations = []
+		self.status = ""
+
+	def add_filter(self, filter):
+		self.filters.append(filter.compile())
+
+	def add_filters(self, filter_list):
+		for filter in filter_list:
+			self.add_filter(filter)
+
+	def add_scope_configuration(self, scope, sheet_id, visual_ids = []):
+		self.sheet_visual_scoping_configurations.append({
+			"Scope": scope,
+			"SheetId": sheet_id,
+			"VisualIds": visual_ids
+		})
+	
+	def set_status(self, status):
+		self.status = status
+
+	def compile(self):
+		self.json = {
+			"CrossDataset": self.cross_dataset,
+			"FilterGroupId": self.id,
+			"Filters": self.filters,
+			"ScopeConfiguration": {
+				"SelectedSheets": {
+					"SheetVisualScopingConfigurations": self.sheet_visual_scoping_configurations
+					}
+				},
+			"Status": self.status
+		}
+
+		return clean_dict(self.json)
+
 ### FILTERS ###
 class Filter():
 	def __init__(self, filter_id, column_name, data_set_identifier):
@@ -646,7 +694,6 @@ class Filter():
 		self.filter_id = filter_id
 		self.column_name = column_name
 		self.data_set_identifier = data_set_identifier
-
 class CategoryFilter(Filter):
 	def __init__(self, filter_id, column_name, data_set_identifier):
 		Filter.__init__(self, filter_id, column_name, data_set_identifier)
@@ -655,39 +702,33 @@ class CategoryFilter(Filter):
 	
 	def add_custom_filter_configuration(self, match_operator, null_option, category_value = "", parameter_name = "", select_all_options = ""):
 		self.configuration = {
-			"Configuration": {
-				"CustomFilterConfiguration": {
-					"MatchOperator": match_operator,
-					"NullOption": null_option,
-					"CategoryValue": category_value,
-					"ParameterName": parameter_name,
-					"SelectAllOptions": select_all_options
-				}
+			"CustomFilterConfiguration": {
+				"MatchOperator": match_operator,
+				"NullOption": null_option,
+				"CategoryValue": category_value,
+				"ParameterName": parameter_name,
+				"SelectAllOptions": select_all_options
 			}
 		}
 
 	def add_custom_filter_list_configuration(self, match_operator, null_option, category_values = [], select_all_options = ""):
 		self.configuration = {
-			"Configuration": {
-				"CustomFilterConfiguration": {
-					"MatchOperator": match_operator,
-					"NullOption": null_option,
-					"CategoryValues": category_values,
-					"SelectAllOptions": select_all_options
-				}
+			"CustomFilterListConfiguration": {
+				"MatchOperator": match_operator,
+				"NullOption": null_option,
+				"CategoryValues": category_values,
+				"SelectAllOptions": select_all_options
 			}
 		}
 
 	def add_filter_list_configuration(self, match_operator, category_values = [], select_all_options = ""):
-		self.configuration = {
-			"Configuration": {
-				"CustomFilterConfiguration": {
-					"MatchOperator": match_operator,
-					"CategoryValues": category_values,
-					"SelectAllOptions": select_all_options
-				}
+		self.configuration = clean_dict({
+			"FilterListConfiguration": {
+				"MatchOperator": match_operator,
+				"CategoryValues": category_values,
+				"SelectAllOptions": select_all_options
 			}
-		}
+		})
 
 	def compile(self):
 		self.json = {
@@ -701,13 +742,154 @@ class CategoryFilter(Filter):
 			}
 		}
 		return clean_dict(self.json)
+class NumericEqualityFilter(Filter):
+	def __init__(self, filter_id, column_name, data_set_identifier, match_operator, null_option):
+		Filter.__init__(self, filter_id, column_name, data_set_identifier)
+		
+		self.match_operator = match_operator
+		self.null_option = null_option
+		self.select_all_options = ""
+		self.value = ""
+		self.parameter_name = ""
+	
+	def set_value(self, value):
+		self.value = value
+
+	def compile(self):
+		self.json = {
+			"NumericEqualityFilter": {
+				"FilterId": self.filter_id,
+				"Column": {
+					"DataSetIdentifier": self.data_set_identifier,
+					"ColumnName": self.column_name
+				},
+				"MatchOperator": self.match_operator,
+				"NullOption": self.null_option,
+				"AggregationFunction": {
+					"CategoricalAggrecationFunction": "",
+					"DateAggregationFunction": "",
+					"NumericalAggregationFunction": {
+						"PercentileAggregation": {
+							"PercentileValue": ""
+						},
+						"SimpleNumericalAggregation": ""
+					}
+
+				},
+				"ParameterName": self.parameter_name,
+				"SelectAllOptions": self.select_all_options,
+				"Value": self.value
+			}
+		}
+		return clean_dict(self.json)
+class TimeRangeFilter(Filter):
+	def __init__(self, filter_id, column_name, data_set_identifier, null_option):
+		Filter.__init__(self, filter_id, column_name, data_set_identifier)
+		
+		self.amount = ""
+		self.granularity = ""
+		self.status = ""
+		self.include_maximum = ""
+		self.include_minimum = ""
+		self.max_value_parameter = ""
+		self.min_value_parameter = ""
+		self.time_granularity = ""
+
+		self.null_option = null_option
+	
+	def add_min_value_parameter(self, min_value_parameter):
+		self.min_value_parameter = min_value_parameter
+
+	def compile(self):
+		self.json = {
+			"TimeRangeFilter": {
+				"FilterId": self.filter_id,
+				"Column": {
+					"DataSetIdentifier": self.data_set_identifier,
+					"ColumnName": self.column_name
+				},
+				"NullOption": self.null_option,
+				"ExcludePeriodConfiguration": {
+					"Amount": self.amount,
+					"Granularity": self.granularity,
+					"Status": self.status
+				},
+				"IncludeMaximum": self.include_maximum,
+				"IncludeMinimum": self.include_minimum,
+				"RangeMaximumValue": {},
+				"RangeMinimumValue": {
+					"Parameter": self.min_value_parameter
+				},
+				"TimeGranularity": self.time_granularity
+			}
+		}
+		return clean_dict(self.json)
+
+
+### FILTER CONTROLS ###
+class FilterControl():
+	def __init__(self, filter_control_id, source_filter_id, title):
+		# ID of filter control
+		self.id = filter_control_id
+		self.element_type = "FILTER_CONTROL"
+		# Name of source filter
+		self.source_filter_id = source_filter_id
+		# Title of filter control
+		self.title = title
+
+		self.custom_label = ""
+		self.font_color = ""
+		self.font_decoration = ""
+		self.font_size = ""
+		self.font_style = ""
+		self.font_weight = ""
+		self.title_options_visibility = ""
+class FilterDateTimePickerControl(FilterControl):
+	def __init__(self, filter_control_id, source_filter_id, title):
+		FilterControl.__init__(self, filter_control_id, source_filter_id, title)
+
+		self.type = ""
+		self.date_time_format = ""
+	
+	def set_date_time_format(self, date_time_format):
+		self.date_time_format = date_time_format
+
+	def compile(self):
+		self.json = {
+			"DateTimePicker": {
+				"FilterControlId": self.id,
+				"SourceFilterId": self.source_filter_id,
+				"Title": self.title,
+				"DisplayOptions": {
+					"DateTimeFormat": self.date_time_format,
+					"TitleOptions": {
+						"CustomLabel": self.custom_label,
+						"FontConfiguration": {
+							"FontColor": self.font_color,
+							"FontDecoration": self.font_decoration,
+							"FontSize": {
+								"Relative": self.font_size
+							},
+							"FontStyle": self.font_style,
+							"FontWeight": {
+								"Name": self.font_weight
+							},
+						"Visibility": self.title_options_visibility
+						},
+					}
+				},
+				"Type": self.type
+			}
+		}
+
+		return clean_dict(self.json)
 
 ### VISUALS ###
 class Visual():
 	def __init__(self, visual_id):
 		# Available in All Visuals
 		self.id = visual_id
-		self.type = "VISUAL"
+		self.element_type = "VISUAL"
 		self.actions = []
 		self.title = {}
 		self.subtitle = {}
@@ -742,14 +924,11 @@ class Visual():
 			}
 		}
 
-	def add_action(self):
-		pass
-
 	def add_categorical_dimension_field(self, column_name, data_set_identifier):
 		self.category.append(
 			{
 				"CategoricalDimensionField": {
-					"FieldId": data_set_identifier + column_name,
+					"FieldId": column_name,
 					"Column": {
 						"ColumnName": column_name,
 						"DataSetIdentifier": data_set_identifier
@@ -758,30 +937,30 @@ class Visual():
 			})
 
 	def add_date_dimension_field(self, column_name, data_set_identifier, date_granularity = "", date_time_format = "", null_string = ""):
-		self.category.append(
+		self.category.append(clean_dict(
 			{
 				"DateDimensionField": {
-					"FieldId": data_set_identifier + column_name,
+					"FieldId": column_name,
 					"Column": {
 						"ColumnName": column_name,
 						"DataSetIdentifier": data_set_identifier
 					},
 					"DateGranularity": date_granularity,
-					"DateTimeFormatConfiguration": {
+					"FormatConfiguration": {
 						"DateTimeFormat": date_time_format,
 						"NullValueFormatConfiguration": {
 							"NullString": null_string
 						},
-						"NumericFormatConfiguration": ""
+						"NumericFormatConfiguration": {}
 					}
 				}
-			})
+			}))
 
 	def add_numerical_dimension_field(self, column_name, data_set_identifier, hierarchy_id = ""):
 		self.category.append(
 			{
 				"NumericalDimensionField": {
-					"FieldId": data_set_identifier + column_name,
+					"FieldId": column_name,
 					"Column": {
 						"ColumnName": column_name,
 						"DataSetIdentifier": data_set_identifier
@@ -794,20 +973,63 @@ class Visual():
 					"HierarchyId": hierarchy_id
 				}
 			})
-	def add_numerical_measure_field(self, column_name, data_set_identifier, aggregation_function = None):
-		self.values.append(
+	def add_numerical_measure_field(self, column_name, data_set_identifier, aggregation_function = None, 
+				 currency_decimal_places = '', currency_number_scale = '', currency_prefix = '', currency_suffix = '',currency_symbol = '',
+				 percentage_suffix = ''):
+		self.values.append(clean_dict(
 				{
 					"NumericalMeasureField": {
-						"FieldId": data_set_identifier + column_name,
+						"FieldId": column_name,
 						"Column": {
 							"ColumnName": column_name,
 							"DataSetIdentifier": data_set_identifier
 						},
 						"AggregationFunction": {
 							"SimpleNumericalAggregation": aggregation_function
+						},
+						"FormatConfiguration": {
+							"FormatConfiguration": {
+								"CurrencyDisplayFormatConfiguration": {
+									"DecimalPlacesConfiguration": {
+										"DecimalPlaces": currency_decimal_places
+									},
+									"NumberScale": currency_number_scale,
+									"Prefix": currency_prefix,
+									"Suffix": currency_suffix,
+									"Symbol": currency_symbol
+								},
+								"NumberDisplayFormatConfiguration": {},
+								"PercentageDisplayFormatConfiguration": {
+									"Suffix": percentage_suffix
+								}
+							}
 						}
 					}
-				})
+				}))
+	
+	def add_filter_action(self,custom_action_id, action_name, trigger, status = "ENABLED", selected_field_options = "", selected_fields = [], target_visual_options = [], target_visuals = []):
+		self.actions.append({
+			"ActionOperations": [
+				{
+					"FilterOperation":{
+						"SelectedFieldsConfiguration": {
+							"SelectedFieldOptions": selected_field_options,
+							"SelectedFields": selected_fields
+						},
+						"TargetVisualsConfiguration": {
+							"SameSheetTargetVisualConfiguration": {
+								"TargetVisualOptions": target_visual_options,
+								"TargetVisuals": target_visuals
+							}
+						}
+					}
+				}
+			],
+			"CustomActionId": custom_action_id,
+			"Name": action_name,
+			"Trigger": trigger,
+			"Status": status
+		})
 
 class BarChartVisual(Visual):
 	def __init__(self, visual_id):
@@ -816,11 +1038,21 @@ class BarChartVisual(Visual):
 		self.bars_arrangement = ""
 		self.orientation = ""
 
+		self.axis_line_visibility = ""
+		self.axis_offset = ""
+		self.grid_line_visibility = ""
+		self.scroll_bar_visibility = ""
+		self.visible_range_from = ""
+		self.visible_range_to = ""
+
 	def set_bars_arrangement(self, bars_arrangement):
 		self.bars_arrangement = bars_arrangement
 
 	def set_orientation(self, orientation):
 		self.orientation = orientation
+
+	def set_scroll_bar_visibility(self, scroll_bar_visibility):
+		self.scroll_bar_visibility = scroll_bar_visibility
 
 	def compile(self):
 		self.json = {
@@ -837,7 +1069,21 @@ class BarChartVisual(Visual):
 						}
 					},
 					"BarsArrangement": self.bars_arrangement,
-					"Orientation": self.orientation
+					"Orientation": self.orientation,
+					"CategoryAxis": {
+						"AxisLineVisibility": self.axis_line_visibility,
+						"AxisOffset": self.axis_offset,
+						"GridLineVisbility": self.grid_line_visibility,
+						"ScrollbarOptions": {
+							"Visibility": self.scroll_bar_visibility,
+							"VisibleRange": {
+								"PercentRange": {
+									"From": self.visible_range_from,
+									"To": self.visible_range_to
+								}
+							}
+						}
+					}
 				},
 				"ColumnHierarchies": self.column_hierarchies,
 				"Title": self.title,
@@ -847,15 +1093,23 @@ class BarChartVisual(Visual):
 		}
 
 		return clean_dict(self.json)
-
 class LineChartVisual(Visual):
 	def __init__(self, visual_id):
 		Visual.__init__(self,visual_id)
 
 		self.type = ""
+		self.axis_line_visibility = ""
+		self.axis_offset = ""
+		self.grid_line_visibility = ""
+		self.scroll_bar_visibility = ""
+		self.visible_range_from = ""
+		self.visible_range_to = ""
 	
 	def set_type(self, type):
 		self.type = type
+
+	def set_scroll_bar_visibility(self, scroll_bar_visibility):
+		self.scroll_bar_visibility = scroll_bar_visibility
 
 	def compile(self):
 		self.json = {
@@ -870,6 +1124,20 @@ class LineChartVisual(Visual):
 							"SmallMultiples": self.small_multiples
 						}
 					},
+					"XAxisDisplayOptions": {
+						"AxisLineVisibility": self.axis_line_visibility,
+						"AxisOffset": self.axis_offset,
+						"GridLineVisbility": self.grid_line_visibility,
+						"ScrollbarOptions": {
+							"Visibility": self.scroll_bar_visibility,
+							"VisibleRange": {
+								"PercentRange": {
+									"From": self.visible_range_from,
+									"To": self.visible_range_to
+								}
+							}
+						}
+					},
 					"Type": self.type
 
 				},
@@ -881,8 +1149,68 @@ class LineChartVisual(Visual):
 		visual_clean = clean_dict(self.json)
 
 		return visual_clean
-
 class TableVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+		self.unaggregated_values = []
+		self.field_sort = []
+	
+	def add_unaggregated_date_time_value(self, column_name, data_set_identifier, date_time_format="", null_string=""):
+		self.unaggregated_values.append(
+			{
+				"UnaggregatedField": {
+					"FieldId": data_set_identifier + column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+						},
+					"FormatConfiguration": {
+						"DateTimeFormatConfiguration": {
+							"DateTimeFormat": date_time_format,
+							"NullValueFormatConfiguration": {
+								"NullString": null_string
+							},
+							"NumericFormatConfiguration": ""
+						}
+					}
+				}
+			})
+
+	def add_field_sort(self,field_id, direction):
+		self.field_sort.append({
+			"FieldSort": {
+				"Direction": direction,
+				"FieldId": field_id
+			}
+		})
+
+	def compile(self):
+		self.json = {
+			"TableVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"TableAggregatedFieldWells": {
+							"GroupBy": self.category,
+							"Values": self.values
+						},
+						"TableUnaggregatedFieldWells": {
+							"Values": self.unaggregated_values
+						}
+					},
+					"SortConfiguration": {
+						"RowSort": self.field_sort
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return clean_dict(self.json)
+
+class PivotTableVisual(Visual):
 	def __init__(self, visual_id):
 		Visual.__init__(self,visual_id)
 
@@ -912,28 +1240,14 @@ class TableVisual(Visual):
 	def add_group_by(self, column_name, data_set_identifier):
 		self.add_categorical_dimension_field(column_name, data_set_identifier)
 
-	def compile(self):
-		self.json = {
-			"TableVisual":{
-				"VisualId": self.id,
-				"ChartConfiguration": {
-					"FieldWells": {
-						"TableAggregatedFieldWells": {
-							"GroupBy": self.category,
-							"Values": self.values
-						},
-						"TableUnaggregatedFieldWells": {
-							"Values": self.unaggregated_values
-						}
+	def add_calculated_measure_field(self, expression, field_id):
+		self.values.append(
+				{
+					"CalculatedMeasureField": {
+						"FieldId": field_id,
+						"Expression": expression
 					}
-				},
-				"Title": self.title,
-				"subtitle": self.subtitle
-			}
-		}
-
-		return clean_dict(self.json)
-
+				})
 ### TEXTBOX ###
 class TextBox():
 	def __init__(self, text_box_id, content):
@@ -948,22 +1262,26 @@ class TextBox():
 
 		return clean_dict(self.json)
 
-
 # Recursive function to remove parameters with empty values from dictionary object
-def clean_dict(input_dict):
-	new_dict = {}
-	for key, value in input_dict.items():
-		if isinstance(value, dict):
-			value = clean_dict(value)
-		if value not in ["", [], {}, [{}]]:
-			new_dict[key] = value
-	return new_dict
+def clean_dict(input):
+    if type(input) is dict:
+        return dict((key, clean_dict(value)) for key, value in input.items() if (value or value == 0) and clean_dict(value) not in [{},[],""])
+    elif type(input) is list:
+        return [clean_dict(item) for item in input if (item or item == 0) and clean_dict(item) not in [{},[],""]]
+    else:
+	    if input or input == 0:
+		    return input
+
+###################################################################
+### This where we are going to create dashboard objects as code ###
+###################################################################
 
 # Analysis
 analysis_1 = Analysis('752669751623','test12333','test-analysis-123334')
 
 # Analysis Definition
-analysis_definition = Definition([{"DataSetArn":"arn:aws:quicksight:us-east-1:752669751623:dataset/4152f9d8-c75c-4d0f-805c-ebd12fcaf77d","Identifier":"AnyCompany Data Set (Company).xlsx"}])
+analysis_definition = Definition([{"DataSetArn":"arn:aws:quicksight:us-east-1:752669751623:dataset/fddb4301-4e9d-458c-bb61-ad68ec168e24","Identifier":"SaaS-Sales.csv"}])
+analysis_definition.set_analysis_default()
 
 # Parameters
 date_parameter_1 = DateTimeParameter("Date")
@@ -972,62 +1290,110 @@ date_parameter_1.set_time_granularity("DAY")
 
 integer_parameter_1 = IntegerParameter("digit","MULTI_VALUED")
 
+# Filters
+product_filter = CategoryFilter("asdgasg", "Product", 'SaaS-Sales.csv')
+product_filter.add_filter_list_configuration('CONTAINS',['Alchemy','Big Ol Database', 'Data Smasher'])
+
+date_filter = TimeRangeFilter("time_range_filter_1", "Order Date", 'SaaS-Sales.csv', "ALL_VALUES")
+date_filter.add_min_value_parameter(date_parameter_1.name)
+
+# Filter Control
+
+
 # Sheet
-sheet_1 = Sheet('sheetid1234', name = "sales")
-sheet_1.set_title("Sales Dashboard")
-sheet_1.set_description("This is a sheet about sales")
+sheet_1 = Sheet('sheetid1234', name = "AnyCompany Sales")
+sheet_1.set_title("AnyCompany Sales")
+sheet_1.set_description("This dashboard shows YTD Sales on AnyCompany Products. All the assets in this dashboard (Visuals, Parameters, Filters, Actions, etc.) were programmatically created using assets-as-code.")
+sheet_1.set_grid_layout("FIXED", "1600px")
+
+sheet_2 = Sheet('sheetid321', name = "costs")
+sheet_2.set_freeform_layout()
+
 
 # Parameter Controls
 parameter_date_control_1 = ParameterDateTimePickerControl("id1234", date_parameter_1.name, "Date")
 parameter_date_control_1.set_title_font(font_decoration="UNDERLINE")
-parameter_drop_down_control_1 = ParameterDropDownControl("112312", integer_parameter_1.name, "Number")
 
 # Visuals
 barchart_1 = BarChartVisual('123456789')
 barchart_1.set_bars_arrangement('CLUSTERED')
 barchart_1.set_orientation('VERTICAL')
-barchart_1.add_categorical_dimension_field('Company','AnyCompany Data Set (Company).xlsx')
-barchart_1.add_numerical_measure_field('Order #','AnyCompany Data Set (Company).xlsx','SUM')
-barchart_1.add_title("VISIBLE","PlainText","This is my title")
-barchart_1.add_subtitle("VISIBLE","PlainText","This is my subtitle")
+barchart_1.add_categorical_dimension_field('Product','SaaS-Sales.csv')
+barchart_1.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
+barchart_1.add_title("VISIBLE","PlainText","Sum of Sales by Product")
+barchart_1.add_subtitle("VISIBLE","PlainText","Use this visual to drill down into specific products.")
+barchart_1.set_scroll_bar_visibility("HIDDEN")
+barchart_1.add_filter_action("quick_filter_action_1", "Quick Filter", "DATA_POINT_CLICK", selected_field_options = "ALL_FIELDS", target_visual_options= "ALL_VISUALS")
 
 barchart_2 = BarChartVisual('232424')
 barchart_2.set_bars_arrangement('STACKED')
 barchart_2.set_orientation('HORIZONTAL')
-barchart_2.add_categorical_dimension_field('Company','AnyCompany Data Set (Company).xlsx')
-barchart_2.add_numerical_measure_field('Order #','AnyCompany Data Set (Company).xlsx','AVERAGE')
+barchart_2.add_categorical_dimension_field('Product','SaaS-Sales.csv')
+barchart_2.add_numerical_measure_field('Profit','SaaS-Sales.csv','AVERAGE')
+barchart_2.set_scroll_bar_visibility("HIDDEN")
+barchart_1.add_title("VISIBLE","PlainText","Average Profit by Product")
+barchart_1.add_subtitle("VISIBLE","PlainText","This is my subtitle")
 
-# # Text Boxes (ERROR)
-# text_box_1 = TextBox("asdklh", "")
+linechart_1 = LineChartVisual('234eet239')
+linechart_1.set_type('LINE')
+linechart_1.add_date_dimension_field('Order Date','SaaS-Sales.csv', date_granularity = "MONTH")
+linechart_1.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
+linechart_1.add_numerical_measure_field('Profit','SaaS-Sales.csv','SUM')
+linechart_1.add_title("VISIBLE","PlainText","Sales vs Profit over time")
+linechart_1.set_scroll_bar_visibility("HIDDEN")
 
-# sheet_1.set_freeform_layout()
-# sheet_1.add_freeform_layout_element(barchart_1, "300px", "300px", "8px", "8px")
-
-sheet_2 = Sheet('sheetid321', name = "costs")
 barchart_3 = BarChartVisual('23409')
 barchart_3.set_bars_arrangement('STACKED')
 barchart_3.set_orientation('HORIZONTAL')
-barchart_3.add_categorical_dimension_field('Company','AnyCompany Data Set (Company).xlsx')
-barchart_3.add_numerical_measure_field('Order #','AnyCompany Data Set (Company).xlsx','SUM')
+barchart_3.add_categorical_dimension_field('Product','SaaS-Sales.csv')
+barchart_3.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
 
 linechart_3 = LineChartVisual('234239')
 linechart_3.set_type('LINE')
-linechart_3.add_categorical_dimension_field('Company','AnyCompany Data Set (Company).xlsx')
-linechart_3.add_numerical_measure_field('Order #','AnyCompany Data Set (Company).xlsx','SUM')
+linechart_3.add_categorical_dimension_field('Product','SaaS-Sales.csv')
+linechart_3.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
 
 table_1 = TableVisual('iolewhtli')
-table_1.add_group_by('Company','AnyCompany Data Set (Company).xlsx')
+table_1.add_categorical_dimension_field('Product','SaaS-Sales.csv')
+table_1.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM', currency_symbol="USD")
+table_1.add_numerical_measure_field('Profit','SaaS-Sales.csv','SUM', currency_symbol="USD")
+table_1.add_numerical_measure_field('Quantity','SaaS-Sales.csv','SUM')
+table_1.add_numerical_measure_field('Discount','SaaS-Sales.csv','AVERAGE', percentage_suffix = '%')
+table_1.add_field_sort("Sales", "DESC")
+table_1.add_title("VISIBLE","PlainText","Product Metrics Table")
 
-# First, add visuals and parameter controls to the sheet they belong to
-sheet_1.add_visuals([barchart_1,barchart_2])
-sheet_1.add_parameter_controls([parameter_date_control_1, parameter_drop_down_control_1])
-# sheet_1.add_text_boxes([text_box_1])
 
-sheet_2.add_visuals([barchart_3,linechart_3, table_1])
+# Filter Group
+filter_group_1 = FilterGroup("ALL_DATASETS", "agasgsgsd")
+filter_group_1.add_scope_configuration("ALL_VISUALS", sheet_1.id)
+filter_group_1.add_filters([product_filter])
+filter_group_1.set_status("ENABLED")
+
+filter_group_2 = FilterGroup("ALL_DATASETS", "agasgsgs4545d")
+filter_group_2.add_scope_configuration("ALL_VISUALS", sheet_1.id)
+filter_group_2.add_filters([date_filter])
+filter_group_2.set_status("ENABLED")
+
+# First, add all elements (visuals, parameter controls, action controls, etc) to the sheet they belong to
+sheet_1.add_visuals([barchart_1,barchart_2,linechart_1, table_1])
+sheet_1.add_parameter_controls([parameter_date_control_1])
+sheet_2.add_visuals([barchart_3,linechart_3])
+
+# Next, specify the layout of all the elements
+sheet_1.add_grid_layout_element(barchart_1, 13, 10, 0, 0)
+sheet_1.add_grid_layout_element(barchart_2, 13, 10, 13, 0)
+sheet_1.add_grid_layout_element(linechart_1, 13, 10, 0, 10)
+sheet_1.add_grid_layout_element(table_1, 13, 10, 13, 10)
+sheet_1.add_grid_layout_element(parameter_date_control_1, 7, 3, 26, 0)
+
+sheet_2.add_freeform_layout_element(linechart_3, "800px","600px","450px","0px")
+sheet_2.add_freeform_layout_element(barchart_3, "600px","600px","0px","800px")
+
 
 # Next, add all sheets to the analysis definition object
 analysis_definition.add_sheets([sheet_1,sheet_2])
 analysis_definition.add_parameters([date_parameter_1, integer_parameter_1])
+analysis_definition.add_filter_groups([filter_group_1, filter_group_2])
 
 # Next, add the analysis definition object to the analysis object
 analysis_1.add_definition(analysis_definition)
@@ -1038,4 +1404,3 @@ print(file)
 
 with open("create-analysis.json", "w") as outfile:
 	outfile.write(file)
-
