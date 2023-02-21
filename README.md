@@ -2,12 +2,14 @@
 
 Amazon QuickSight Assets-as-Code allow customers and partners to treat BI resources as code assets that sit outside of the QuickSight platform. This unlocks a number of capabilities, including but not limited to use cases such as programmatic dashboard creation, version control, BI workfload migration, and much more.
 
-Currently, these APIs (DescribeAnalysisDefinition, DescribeTemplateDefinition, DescribeDashboardDefinition) allow developers to manage all supported charts and visual components in JSON format.
+Currently, these APIs (*DescribeAnalysisDefinition, DescribeTemplateDefinition, DescribeDashboardDefinition*) allow developers to manage all supported charts and visual components in JSON format.
 
 With complex dashboards with many resources, however, navigating through nested JSON code can be difficult to update and maintain. This code sample takes Assets-as-Code a step further and demonstrates way to define dashboard resources as python objects.
 
+*Note: This code sample is not comprehensive of all QuickSight resources and visual types, and simply showcases potential capabilities.*
 ## Example
 
+# Visuals
 For example, to create a new Line Chart object, you can simply call the below line of code.
 ```
 linechart_1 = LineChartVisual(visual_id = 'linechart1')
@@ -18,7 +20,22 @@ linechart_1.set_type('LINE')
 
 linechart_1.add_date_dimension_field('Order Date','SaaS-Sales.csv', date_granularity = "MONTH")
 ```
-*Note: This code sample is not comprehensive of all QuickSight resources and visual types, and simply showcases potential capabilities.*
+
+Once you are done defining your resources, the code sample will package all of your resources into a single JSON structure that is acceptable by QuickSight.
+
+# Sheets
+Similarly, you can create sheets and further configure the sheet.
+```
+sheet_1 = Sheet('sheet1', name = "AnyCompany Sales")
+sheet_1.set_title("AnyCompany Sales")
+sheet_1.set_grid_layout("FIXED", "1600px")
+```
+You can add objects to your sheet, and even specify the layout and size of your visuals.
+```
+sheet_1.add_grid_layout_element(linechart_1, 13, 10, 0, 10)
+sheet_1.add_grid_layout_element(table_1, 13, 10, 13, 10)
+sheet_1.add_grid_layout_element(parameter_date_control_1, 7, 3, 26, 0)
+```
 
 ## How it works
 
