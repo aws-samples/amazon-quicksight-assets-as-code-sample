@@ -6,6 +6,8 @@ Currently, these APIs (DescribeAnalysisDefinition, DescribeTemplateDefinition, D
 
 With complex dashboards with many resources, however, navigating through nested JSON code can be difficult to update and maintain. This code sample takes Assets-as-Code a step further and demonstrates way to define dashboard resources as python objects.
 
+## Example
+
 For example, to create a new Line Chart object, you can simply call the below line of code.
 ```
 linechart_1 = LineChartVisual(visual_id = 'linechart1')
@@ -30,7 +32,7 @@ The repo contains three main constructs - 1) **quicksight_assets_class.py**, 2) 
 3. **asset-definition.json**
     - This is the JSON file that will be used in the create-analysis or update-analysis APIs to either create a new analysis or update an existing analysis.
 
-You can call the API using the CLI as noted below, or use AWS SDKs in your programming language of choice.
+You can call the API using the AWS CLI as noted below, or use AWS SDKs in your programming language of choice.
 ```
 aws quicksight update-analysis --cli-input-json file://asset-definition.json --region us-east-1 --profile [your-aws-profile-here]
 ```
