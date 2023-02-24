@@ -50,6 +50,8 @@ The repo contains three main constructs - 1) **quicksight_assets_class.py**, 2) 
     - This is the JSON file that will be used in the create-analysis or update-analysis APIs.
 
 ### Architecture
+
+![Architecture](img/Assets-as-Code-Architecture.png)
 ### Calling the function using AWS CLI
 
 You can call the API using the AWS CLI as noted below.
@@ -71,7 +73,7 @@ Next, upload to zipped file to Lambda Layers and attach the layer to your Lambda
 from quicksight_assets_class import *
 ```
 
-*Note: Since assets-as-code is a relatively new feature, it may not be supported in the newest version of Boto3 inside Lambda. If this is the case, you will also need to add the latest version of Boto3 to your Lambda function to make it work.*
+*Note: Since assets-as-code is a relatively new feature, it may not be supported in the current Boto3 version inside Lambda. If this is the case, you will also need to add the latest version of Boto3 to your Lambda function to make it work.*
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
