@@ -6,10 +6,10 @@ from quicksight_assets_class import *
 
 def main():
 	# Analysis
-	analysis_1 = Analysis('752669751623','analysis1','Assets as Code - Sample Analysis')
+	analysis_1 = Analysis('<your-aws-account-id>','analysis1','Assets as Code - Sample Analysis')
 
 	# Analysis Definition
-	analysis_definition = Definition([{"DataSetArn":"arn:aws:quicksight:us-east-1:752669751623:dataset/fddb4301-4e9d-458c-bb61-ad68ec168e24","Identifier":"SaaS-Sales.csv"}])
+	analysis_definition = Definition([{"DataSetArn":"<your-dataset-arn>","Identifier":"SaaS-Sales.csv"}])
 	analysis_definition.set_analysis_default()
 
 	# Parameters
@@ -132,10 +132,10 @@ def main():
 	analysis_1.add_definition(analysis_definition)
 
 	# Finally, compile the analysis into a single JSON object
-	file = analysis_1.compile()
+	file = json.dumps(analysis_1.compile(), indent=6)
 	print(file)
 
-	with open("asset-definition.json", "w") as outfile:
+	with open("asset_definition.json", "w") as outfile:
 		outfile.write(file)
 
 if __name__ == "__main__":

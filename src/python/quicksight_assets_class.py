@@ -1357,7 +1357,6 @@ class TextBox():
 		return self.json
 
 # Recursive function to remove parameters with empty values from dictionary object
-# This functions is run only once when you call analysis.compile()
 def clean_dict(input):
     if type(input) is dict:
         return dict((key, clean_dict(value)) for key, value in input.items() if (value or value == 0) and clean_dict(value) not in [{},[],""])
