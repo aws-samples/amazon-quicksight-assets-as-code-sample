@@ -1,15 +1,19 @@
 from quicksight_assets_class import *
-
+import json
+import boto3
 ###################################################################
 ### This where we are going to create dashboard objects as code ###
 ###################################################################
 
 def main():
 	# Analysis
-	analysis_1 = Analysis('<your-aws-account-id>','analysis1','Assets as Code - Sample Analysis')
+	#analysis_1 = Analysis('<your-aws-account-id>','analysis1','Assets as Code - Sample Analysis')
+
+	# TODO REMOVE THIS
+	analysis_1 = Analysis('752669751623','analysis1','Assets as Code - Sample Analysis')
 
 	# Analysis Definition
-	analysis_definition = Definition([{"DataSetArn":"<your-dataset-arn>","Identifier":"SaaS-Sales.csv"}])
+	analysis_definition = Definition([{"DataSetArn":"arn:aws:quicksight:us-east-1:752669751623:dataset/3a47da5a-79e6-43dc-94a3-6e01b8603b6a","Identifier":"SaaS-Sales.csv"}])
 	analysis_definition.set_analysis_default()
 
 	# Parameters
@@ -21,7 +25,7 @@ def main():
 
 	# Filters
 	product_filter = CategoryFilter("asdgasg", "Product", 'SaaS-Sales.csv')
-	product_filter.add_filter_list_configuration('CONTAINS',['Alchemy','Big Ol Database', 'Data Smasher'])
+	product_filter.add_filter_list_configuration('CONTAINS',['Alchemy','Big Ol Database', 'Data Smasher', 'OneView', 'ChatBot Plugin'])
 
 	date_filter = TimeRangeFilter("time_range_filter_1", "Order Date", 'SaaS-Sales.csv', "ALL_VALUES")
 	date_filter.add_min_value_parameter(date_parameter_1.name)
@@ -91,6 +95,19 @@ def main():
 	table_1.add_numerical_measure_field('Profit','SaaS-Sales.csv','SUM', currency_symbol="USD")
 	table_1.add_numerical_measure_field('Quantity','SaaS-Sales.csv','SUM')
 	table_1.add_numerical_measure_field('Discount','SaaS-Sales.csv','AVERAGE', percentage_suffix = '%')
+	table_1.add_inline_visualization('Profit')
+
+	table_1.add_icon_conditional_formatting('Sales','SUM({Sales}) > \"TOP_25_PERCENT\"', icon = 'THREE_BAR', color='#0251D3')
+	table_1.add_icon_conditional_formatting('Sales','(SUM({Sales}) >= \"BOTTOM_25_PERCENT\") AND (SUM({Sales}) <= \"TOP_25_PERCENT\")', icon = 'TWO_BAR', color = '#0251D3')
+	table_1.add_icon_conditional_formatting('Sales','SUM({Sales}) < \"BOTTOM_25_PERCENT\"', icon = 'ONE_BAR', color = '#0251D3')
+	table_1.add_gradient_text_conditional_formatting('Sales', 'SUM({Sales})', 
+		[{ "GradientOffset": 0.0,"DataValue": 0.0,"Color": "#DE3E00"}, 
+		{ "GradientOffset": 0.0,"DataValue": 200000.0,"Color": "#BADF2D"}])
+	table_1.add_gradient_text_conditional_formatting('Discount', 'AVG({Discount})', 
+		[{ "GradientOffset": 0.0,"DataValue": 0.0,"Color": "#DE3E00"},
+		{ "GradientOffset": 50,"DataValue": 0.5,"Color": "#BADF2D"}])
+	table_1.set_cell_border_type('UniformBorder', style = 'NONE')
+	table_1.set_header_border_type('InnerHorizontal', thickness=2)
 	table_1.add_field_sort("Sales", "DESC")
 	table_1.add_title("VISIBLE","PlainText","Product Metrics Table")
 
@@ -131,9 +148,37 @@ def main():
 	# Next, add the analysis definition object to the analysis object
 	analysis_1.add_definition(analysis_definition)
 
-	# Finally, compile the analysis into a single JSON object
-	file = json.dumps(analysis_1.compile(), indent=6)
-	print(file)
+	analysis_json = analysis_1.compile()
+
+	# When calling this code directly from Lambda, you will want to 1) import boto3, 2) make sure your Lambda function has the right permissions, and 
+	# 3) pass the values directly to the API.
+	'''
+	client = boto3.client('quicksight')
+
+	response = client.update_analysis(
+		AwsAccountId = analysis_json["AwsAccountId"],
+		AnalysisId = analysis_json["AnalysisId"],
+		Definition = analysis_json["Definition"],
+		Name = analysis_json["Name"],
+		Parameters = analysis_json["Parameters"],
+		Permissions = analysis_json["Permissions"],
+		SourceEntity = analysis_json["SourceEntity"],
+		Tags = analysis_json["Tags"],
+		ThemeArn = analysis_json["ThemeArn"]
+		)
+	
+	return response
+	'''
+
+	# When calling this code from the AWS CLI, you will want to dump the dictionary into a JSON and output an assets_definition file.
+	# This assets_definition file will be referenced as the definition file when you call the API through CLI commands.
+	'''
+	file = json.dumps(analysis_json, indent=6)
+
+	with open("asset_definition.json", "w") as outfile:
+		outfile.write(file)
+	'''
+	file = json.dumps(analysis_json, indent=6)
 
 	with open("asset_definition.json", "w") as outfile:
 		outfile.write(file)

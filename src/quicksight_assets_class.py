@@ -1178,6 +1178,14 @@ class TableVisual(Visual):
 
 		self.unaggregated_values = []
 		self.field_sort = []
+		self.inline_visualizations = []
+		self.conditional_formatting_options = []
+
+		self.cell_background_color = ""
+		self.header_background_color = ""
+
+		self.cell_border = {}
+		self.header_border = {}
 	
 	def add_unaggregated_date_time_value(self, column_name, data_set_identifier, date_time_format="", null_string=""):
 		self.unaggregated_values.append(
@@ -1200,13 +1208,100 @@ class TableVisual(Visual):
 				}
 			})
 
-	def add_field_sort(self,field_id, direction):
+	def add_field_sort(self, field_id, direction):
 		self.field_sort.append({
 			"FieldSort": {
 				"Direction": direction,
 				"FieldId": field_id
 			}
 		})
+
+	def set_cell_border_type(self, border_type, color = "", style="", thickness=""):
+
+		border_options = {}
+		border_options[border_type] = { 
+				"Color": color,
+				"Style": style,
+				"Thickness": thickness
+		}
+
+		if border_type == "UniformBorder":
+			self.cell_border = border_options
+		else:
+			self.cell_border = {
+				"SideSpecificBorder": border_options
+			}
+	
+	def set_header_border_type(self, border_type, color = "", style="", thickness=""):
+		border_options = {}
+		border_options[border_type] = { 
+				"Color": color,
+				"Style": style,
+				"Thickness": thickness
+		}
+
+		if border_type == "UniformBorder":
+			self.header_border = border_options
+		else:
+			self.header_border = {
+				"SideSpecificBorder": border_options
+			}
+
+	def add_inline_visualization(self, field_id, negative_color = "", positive_color = ""):
+		self.inline_visualizations.append({
+			"DataBars": {
+				"FieldId": field_id,
+				"NegativeColor": negative_color,
+				"PositiveColor": positive_color
+			}
+		})
+
+	def add_icon_conditional_formatting(self, field_id, expression, icon = "", unicode_icon = "", color = "", icon_display_option = ""):
+		self.conditional_formatting_options.append({
+			"Cell": {
+				"FieldId": field_id,
+				"TextFormat": {
+					"Icon": {
+						"CustomCondition": {
+							"Expression": expression,
+							"IconOptions": {
+								"Icon": icon,
+								"UnicodeIcon": unicode_icon
+							},
+							"Color": color,
+							"DisplayConfiguration": {
+								"IconDisplayOption": icon_display_option
+							}
+						},
+						# "IconSet": {
+						# 	"Expression": icon_set_expression,
+						# 	# PLUS_MINUS | CHECK_X | THREE_COLOR_ARROW | THREE_GRAY_ARROW | CARET_UP_MINUS_DOWN | THREE_SHAPE | 
+						# 	# THREE_CIRCLE | FLAGS | BARS | FOUR_COLOR_ARROW | FOUR_GRAY_ARROW
+						# 	"IconSetType": icon_set_type
+						# }
+					}
+				}
+			}
+		}
+		)
+
+	def add_gradient_text_conditional_formatting(self, field_id, expression, gradient_stops = []):
+		self.conditional_formatting_options.append({
+			"Cell": {
+				"FieldId": field_id,
+				"TextFormat": {
+					"TextColor": {
+						"Gradient": {
+							"Expression": expression,
+							"Color": {
+								"Stops": gradient_stops
+							}
+						}
+					}
+				}
+			}
+		}
+		)		
 
 	def compile(self):
 		self.json = {
@@ -1224,79 +1319,21 @@ class TableVisual(Visual):
 					},
 					"SortConfiguration": {
 						"RowSort": self.field_sort
+					},
+					"TableInlineVisualizations": self.inline_visualizations,
+					"TableOptions": {
+						"CellStyle": {
+							"BackgroundColor": self.cell_background_color,
+							"Border": self.cell_border
+						},
+						"HeaderStyle": {
+							"BackgroundColor": self.header_background_color,
+							"Border": self.header_border
+						}
 					}
 				},
 				"ConditionalFormatting": {
-					"ConditionalFormattingOptions": {
-						"Cell": {
-							"FieldId": "",
-							"TextFormat": {
-								"BackgroundColor": {
-									"Gradient": {
-										"Color": {
-											"Stops": []
-										},
-										"Expression": ""
-									},
-									"Solid": {
-										"Color": "",
-										"Expression": ""
-									}
-								},
-								"Icon": {
-									"CustomCondition": {
-										"Color": "",
-										"Expression": "",
-										"IconOptions": {
-											"Icon": "",
-											"UnicodeIcon": ""
-										},
-										"DisplayConfiguration": {
-											"IconDisplayOption": ""
-										}
-									}
-								},
-								"TextColor": {
-									"Gradient": {
-										"Color": {
-											"Stops": []
-										},
-										"Expression": ""
-									},
-									"Solid": {
-										"Color": "",
-										"Expression": ""
-									}
-								}
-							}
-						},
-						"Row": {
-							"BackgroundColor": {
-								"Gradient": {
-									"Color": {
-										"Stops": []
-									},
-									"Expression": ""
-								},
-								"Solid": {
-									"Color": "",
-									"Expression": ""
-								}
-							},
-							"TextColor": {
-								"Gradient": {
-									"Color": {
-										"Stops": []
-									},
-									"Expression": ""
-								},
-								"Solid": {
-									"Color": "",
-									"Expression": ""
-								}
-							}
-						}
-					}
+					"ConditionalFormattingOptions": self.conditional_formatting_options
 				},
 				"Title": self.title,
 				"subtitle": self.subtitle

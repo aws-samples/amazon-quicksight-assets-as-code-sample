@@ -5,7 +5,7 @@
       "Definition": {
             "DataSetIdentifierDeclarations": [
                   {
-                        "DataSetArn": "arn:aws:quicksight:us-east-1:752669751623:dataset/fddb4301-4e9d-458c-bb61-ad68ec168e24",
+                        "DataSetArn": "arn:aws:quicksight:us-east-1:752669751623:dataset/3a47da5a-79e6-43dc-94a3-6e01b8603b6a",
                         "Identifier": "SaaS-Sales.csv"
                   }
             ],
@@ -48,7 +48,9 @@
                                                       "CategoryValues": [
                                                             "Alchemy",
                                                             "Big Ol Database",
-                                                            "Data Smasher"
+                                                            "Data Smasher",
+                                                            "OneView",
+                                                            "ChatBot Plugin"
                                                       ]
                                                 }
                                           }
@@ -494,7 +496,136 @@
                                                                   }
                                                             }
                                                       ]
+                                                },
+                                                "TableInlineVisualizations": [
+                                                      {
+                                                            "DataBars": {
+                                                                  "FieldId": "Profit"
+                                                            }
+                                                      }
+                                                ],
+                                                "TableOptions": {
+                                                      "CellStyle": {
+                                                            "Border": {
+                                                                  "UniformBorder": {
+                                                                        "Style": "NONE"
+                                                                  }
+                                                            }
+                                                      },
+                                                      "HeaderStyle": {
+                                                            "Border": {
+                                                                  "SideSpecificBorder": {
+                                                                        "InnerHorizontal": {
+                                                                              "Thickness": 2
+                                                                        }
+                                                                  }
+                                                            }
+                                                      }
                                                 }
+                                          },
+                                          "ConditionalFormatting": {
+                                                "ConditionalFormattingOptions": [
+                                                      {
+                                                            "Cell": {
+                                                                  "FieldId": "Sales",
+                                                                  "TextFormat": {
+                                                                        "Icon": {
+                                                                              "CustomCondition": {
+                                                                                    "Expression": "SUM({Sales}) > \"TOP_25_PERCENT\"",
+                                                                                    "IconOptions": {
+                                                                                          "Icon": "THREE_BAR"
+                                                                                    },
+                                                                                    "Color": "#0251D3"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            }
+                                                      },
+                                                      {
+                                                            "Cell": {
+                                                                  "FieldId": "Sales",
+                                                                  "TextFormat": {
+                                                                        "Icon": {
+                                                                              "CustomCondition": {
+                                                                                    "Expression": "(SUM({Sales}) >= \"BOTTOM_25_PERCENT\") AND (SUM({Sales}) <= \"TOP_25_PERCENT\")",
+                                                                                    "IconOptions": {
+                                                                                          "Icon": "TWO_BAR"
+                                                                                    },
+                                                                                    "Color": "#0251D3"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            }
+                                                      },
+                                                      {
+                                                            "Cell": {
+                                                                  "FieldId": "Sales",
+                                                                  "TextFormat": {
+                                                                        "Icon": {
+                                                                              "CustomCondition": {
+                                                                                    "Expression": "SUM({Sales}) < \"BOTTOM_25_PERCENT\"",
+                                                                                    "IconOptions": {
+                                                                                          "Icon": "ONE_BAR"
+                                                                                    },
+                                                                                    "Color": "#0251D3"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            }
+                                                      },
+                                                      {
+                                                            "Cell": {
+                                                                  "FieldId": "Sales",
+                                                                  "TextFormat": {
+                                                                        "TextColor": {
+                                                                              "Gradient": {
+                                                                                    "Expression": "SUM({Sales})",
+                                                                                    "Color": {
+                                                                                          "Stops": [
+                                                                                                {
+                                                                                                      "GradientOffset": 0.0,
+                                                                                                      "DataValue": 0.0,
+                                                                                                      "Color": "#DE3E00"
+                                                                                                },
+                                                                                                {
+                                                                                                      "GradientOffset": 0.0,
+                                                                                                      "DataValue": 200000.0,
+                                                                                                      "Color": "#BADF2D"
+                                                                                                }
+                                                                                          ]
+                                                                                    }
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            }
+                                                      },
+                                                      {
+                                                            "Cell": {
+                                                                  "FieldId": "Discount",
+                                                                  "TextFormat": {
+                                                                        "TextColor": {
+                                                                              "Gradient": {
+                                                                                    "Expression": "AVG({Discount})",
+                                                                                    "Color": {
+                                                                                          "Stops": [
+                                                                                                {
+                                                                                                      "GradientOffset": 0.0,
+                                                                                                      "DataValue": 0.0,
+                                                                                                      "Color": "#DE3E00"
+                                                                                                },
+                                                                                                {
+                                                                                                      "GradientOffset": 50,
+                                                                                                      "DataValue": 0.5,
+                                                                                                      "Color": "#BADF2D"
+                                                                                                }
+                                                                                          ]
+                                                                                    }
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            }
+                                                      }
+                                                ]
                                           },
                                           "Title": {
                                                 "Visibility": "VISIBLE",
