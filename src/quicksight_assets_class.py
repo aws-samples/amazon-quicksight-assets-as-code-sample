@@ -2,16 +2,36 @@ import json
 
 class Analysis():
 	def __init__(self, aws_account_id, analysis_id, analysis_name):
-		# Document required
+		# The ID of the AWS account where you are creating an analysis.
 		self.aws_account_id = aws_account_id
+
+		# The ID for the analysis that you're creating. This ID displays in the URL of the analysis.
 		self.analysis_id = analysis_id
+
+		# A descriptive name for the analysis that you're creating. 
+		# This name displays for the analysis in the Amazon QuickSight console.
 		self.analysis_name = analysis_name
+
+		# A definition is the data model of all features in a Dashboard, Template, or Analysis.
+		#Either a SourceEntity or a Definition must be provided in order for the request to be valid.
 		self.definition = {}
+
+		# The parameter names and override values that you want to use.
 		self.parameters = {}
-		self.permissions = {}
-		# Template
+
+		# A structure that describes the principals and the resource-level permissions on an analysis. 
+		# You can use the Permissions structure to grant permissions by providing a list of 
+		# AWS Identity and Access Management (IAM) action information for each principal listed by Amazon Resource Name (ARN).
+		self.permissions = []
+
+		# A source entity to use for the analysis that you're creating. 
+		# This metadata structure contains details that describe a source template and one or more datasets.
 		self.source_entity = {}
+
+		# Contains a map of the key-value pairs for the resource tag or tags assigned to the analysis.
 		self.tags = []
+
+		# The ARN for the theme to apply to the analysis that you're creating.
 		self.theme_arn = ""
 
 	def add_tags(self, tag_key, tag_value):
@@ -40,13 +60,29 @@ class Analysis():
 	
 class Definition():
 	def __init__(self, data_set_definition):
+		# An array of dataset identifier declarations. 
+		# This mapping allows the usage of dataset identifiers instead of dataset ARNs throughout analysis sub-structures.
 		self.data_set_definition = data_set_definition
-		self.sheets = []
+
+		# The configuration for default analysis settings.
+		self.analysis_defaults = {}		
+
+		# An array of calculated field definitions for the analysis.
 		self.calculated_fields = []
+
+		# An array of analysis-level column configurations. 
+		# Column configurations can be used to set default formatting for a column to be used throughout an analysis.
 		self.column_configurations = []
+
+		# Filter definitions for an analysis.
 		self.filter_groups = []
+
+		#An array of parameter declarations for an analysis.
 		self.parameter_declarations = []
-		self.analysis_defaults = {}
+
+		# An array of sheet definitions for an analysis. 
+		# Each SheetDefinition provides detailed information about a sheet within this analysis.
+		self.sheets = []
 
 	def add_sheet(self, sheet):
 		self.sheets.append(sheet.compile())
@@ -120,16 +156,41 @@ class Definition():
 ### SHEET ###
 class Sheet():
 	def __init__(self, sheet_id, name):
+		# The unique identifier of a sheet.
 		self.id = sheet_id
-		self.name = name
-		self.title = ""
+
+		# The layout content type of the sheet. Choose one of the following options:
+		# Valid Values: PAGINATED | INTERACTIVE
+		self.content_type = ""	
+
+		# A description of the sheet.
 		self.description = ""
-		self.visuals = []
+
+		# The list of filter controls that are on a sheet.
 		self.filter_controls = []
-		self.parameter_controls = []
+
+		# Layouts define how the components of a sheet are arranged.
 		self.layout = {}
-		self.content_type = ""
-		self.text_boxes = []
+
+		# The name of the sheet. 
+		# This name is displayed on the sheet's tab in the Amazon QuickSight console.
+		self.name = name
+
+		# The list of parameter controls that are on a sheet.
+		self.parameter_controls = []
+
+		# The control layouts of the sheet.
+		self.sheet_control_layouts = []
+
+		# The text boxes that are on a sheet.
+		self.text_boxes = []		
+
+		# The title of the sheet.
+		self.title = ""
+
+		# A list of the visuals that are on a sheet.
+		# Visual placement is determined by the layout of the sheet.
+		self.visuals = []
 
 	def add_visual(self, visual):
 		self.visuals.append(visual.compile())
@@ -268,8 +329,13 @@ class Sheet():
 ### CALCULATED FIELDS ###
 class CalculatedField():
 	def __init__(self, data_set_identifier, expression, name):
+		# The data set that is used in this calculated field.
 		self.data_set_identifier = data_set_identifier
+
+		# The expression of the calculated field.
 		self.expression = expression
+
+		# The name of the calculated field.
 		self.name = name
 
 	def compile(self):
@@ -284,11 +350,19 @@ class CalculatedField():
 ### PARAMETERS ###
 class Parameter():
 	def __init__(self, name):
+		# The name of the parameter that is being declared.
 		self.name = name
 
-		self.custom_value = ""
-		self.value_when_unset_option = ""
+		# The default values of a parameter. 
+		# If the parameter is a single-value parameter, a maximum of one default value can be provided.
 		self.default_value = {}
+
+		# A custom value that's used when the value of a parameter isn't set.
+		self.custom_value = ""
+
+		# The built-in options for default values. The value can be one of the following:
+		# RECOMMENDED_VALUE | NULL
+		self.value_when_unset_option = ""
 
 	def set_static_default_value(self, static_default_value):
 		self.default_value = {
@@ -317,6 +391,8 @@ class DateTimeParameter(Parameter):
 	def __init__(self, name):
 		Parameter.__init__(self, name)
 
+		# The level of time precision that is used to aggregate DateTime values.
+		# Valid Values: YEAR | QUARTER | MONTH | WEEK | DAY | HOUR | MINUTE | SECOND | MILLISECOND
 		self.time_granularity = ""
 	
 	def set_rolling_date_default_value(self, expression, data_set_identifier = ""):
@@ -327,7 +403,6 @@ class DateTimeParameter(Parameter):
 			}
 		}
 
-	# YEAR | QUARTER | MONTH | WEEK | DAY | HOUR | MINUTE | SECOND | MILLISECOND
 	def set_time_granularity(self, time_granularity):
 		self.time_granularity = time_granularity
 
@@ -349,6 +424,7 @@ class DecimalParameter(Parameter):
 	def __init__(self, name, parameter_value_type):
 		Parameter.__init__(self, name)
 
+		# The value type determines whether the parameter is a single-value or multi-value parameter.
 		# MULTI_VALUED | SINGLE_VALUED
 		self.parameter_value_type = parameter_value_type
 
@@ -370,6 +446,7 @@ class IntegerParameter(Parameter):
 	def __init__(self, name, parameter_value_type):
 		Parameter.__init__(self, name)
 
+		# The value type determines whether the parameter is a single-value or multi-value parameter.
 		# MULTI_VALUED | SINGLE_VALUED
 		self.parameter_value_type = parameter_value_type
 
@@ -390,6 +467,7 @@ class StringParameter(Parameter):
 	def __init__(self, name, parameter_value_type):
 		Parameter.__init__(self, name)
 
+		# The value type determines whether the parameter is a single-value or multi-value parameter.
 		# MULTI_VALUED | SINGLE_VALUED
 		self.parameter_value_type = parameter_value_type
 
@@ -671,7 +749,6 @@ class ParameterTextFieldControl(ParameterControl):
 		}
 		return self.json
 
-
 ### FILTER GROUP ###
 class FilterGroup():
 	def __init__(self,cross_dataset, filter_group_id):
@@ -850,7 +927,6 @@ class TimeRangeFilter(Filter):
 			}
 		}
 		return self.json
-
 
 ### FILTER CONTROLS ###
 class FilterControl():

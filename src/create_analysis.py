@@ -6,8 +6,12 @@ import boto3
 ###################################################################
 
 def main():
-	# Analysis
-	#analysis_1 = Analysis('<your-aws-account-id>','analysis1','Assets as Code - Sample Analysis')
+	# #Analysis
+	# analysis_1 = Analysis('<your-aws-account-id>','analysis1','Assets as Code - Sample Analysis')
+
+	# #Analysis Definition
+	# analysis_definition = Definition([{"DataSetArn":"<your-dataset-arn>","Identifier":"<your-dataset-identifier>"}])
+	# analysis_definition.set_analysis_default()
 
 	# TODO REMOVE THIS
 	analysis_1 = Analysis('752669751623','analysis1','Assets as Code - Sample Analysis')
@@ -155,23 +159,43 @@ def main():
 	'''
 	client = boto3.client('quicksight')
 
-	response = client.update_analysis(
+	# Creating a new analysis
+	response = client.create_analysis(
 		AwsAccountId = analysis_json["AwsAccountId"],
 		AnalysisId = analysis_json["AnalysisId"],
 		Definition = analysis_json["Definition"],
 		Name = analysis_json["Name"],
-		Parameters = analysis_json["Parameters"],
-		Permissions = analysis_json["Permissions"],
-		SourceEntity = analysis_json["SourceEntity"],
-		Tags = analysis_json["Tags"],
-		ThemeArn = analysis_json["ThemeArn"]
+		# # Remove if not used
+		# Parameters = analysis_json["Parameters"],
+		# # Remove if not used
+		# Permissions = analysis_json["Permissions"],
+		# # Remove if not used
+		# SourceEntity = analysis_json["SourceEntity"],
+		# # Remove if not used
+		# Tags = analysis_json["Tags"],
+		# # Remove if not used
+		# ThemeArn = analysis_json["ThemeArn"]
 		)
-	
+
+	# Updating an existing analysis
+	response = client.create_analysis(
+		AwsAccountId = analysis_json["AwsAccountId"],
+		AnalysisId = analysis_json["AnalysisId"],
+		Definition = analysis_json["Definition"],
+		Name = analysis_json["Name"],
+		# # Remove if not used
+		# Parameters = analysis_json["Parameters"],
+		# # Remove if not used
+		# SourceEntity = analysis_json["SourceEntity"],
+		# # Remove if not used
+		# ThemeArn = analysis_json["ThemeArn"]
+		)
+
 	return response
 	'''
 
-	# When calling this code from the AWS CLI, you will want to dump the dictionary into a JSON and output an assets_definition file.
-	# This assets_definition file will be referenced as the definition file when you call the API through CLI commands.
+	# When calling this code from the AWS CLI, you will want to dump the dictionary into an output JSON file (assets_definition.json).
+	# This assets_definition.json file will be referenced as the definition file when you call the API through CLI commands.
 	'''
 	file = json.dumps(analysis_json, indent=6)
 
