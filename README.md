@@ -1,14 +1,14 @@
 # QuickSight Assets-as-Code
 
-## Overview
+## :bulb: Overview
 Amazon QuickSight "Assets-as-Code" allows BI users to treat QuickSight resources as code assets that can be managed outside of the QuickSight platform. This unlocks a number of capabilities for new and existing QuickSight users, including use cases like programmatic dashboard creation, version control & CI/CD pipelines, BI workload migration and more.
 
 Currently, these APIs (*DescribeAnalysisDefinition, DescribeTemplateDefinition, DescribeDashboardDefinition*) allow developers to manage all supported charts and visual components in JSON format. With the defined JSON format, users can call the create/update APIs (*CreateAnalysis, UpdateAnalysis, CreateDashboard, UpdateDashboard*) to create or update QuickSight resources using the JSON format.
 
 **With complex dashboards containing many resources, however, navigating through nested JSON code can be difficult to maintain. This code sample takes Assets-as-Code to the next level and demonstrates a way to declare dashboard resources (sheets, visuals, parameters, etc) as intuitive Python code.**
 
-:no good: *Disclaimer: This code sample is not exhaustive and does not support all QuickSight resources and visual types. The purpose of this sample is to demonstrate the possibilities you can unlock using assets-as-code.*
-## Example
+:no_good: *Disclaimer: This code sample is not exhaustive and does not support all QuickSight resources and visual types. The purpose of this sample is to demonstrate the possibilities you can unlock using assets-as-code.*
+## :framed_picture: Example
 
 ### Output
 
@@ -96,11 +96,11 @@ from quicksight_assets_class import *
 Once you run the Lambda function, it should create/update your analysis.
 
 *Note: Since assets-as-code is a relatively new feature, it may not be supported in the current Boto3 version inside Lambda. If this is the case, you will also need to add the latest version of Boto3 to your Lambda function to make it work.*
-## Security
+## :closed_lock_with_key: Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
 
-## License
+## :ledger: License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
 
