@@ -10,7 +10,7 @@ def main():
 	analysis_1 = Analysis('<your-aws-account-id>','analysis1','Assets as Code - Sample Analysis')
 
 	#Analysis Definition
-	analysis_definition = Definition([{"DataSetArn":"<your-dataset-arn>","Identifier":"<your-dataset-identifier>"}])
+	analysis_definition = Definition([{"DataSetArn":"<your-dataset-arn>","Identifier":"SaaS-Sales.csv"}])
 	analysis_definition.set_analysis_default()
 
 
