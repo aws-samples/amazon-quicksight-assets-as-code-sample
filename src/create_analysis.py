@@ -13,7 +13,6 @@ def main():
 	analysis_definition = Definition([{"DataSetArn":"<your-dataset-arn>","Identifier":"SaaS-Sales.csv"}])
 	analysis_definition.set_analysis_default()
 
-
 	# Parameters
 	date_parameter_1 = DateTimeParameter("Date")
 	date_parameter_1.set_static_default_value("2017/01/01")
@@ -28,8 +27,6 @@ def main():
 	date_filter = TimeRangeFilter("timerangefilter1", "Order Date", 'SaaS-Sales.csv', "ALL_VALUES")
 	date_filter.add_min_value_parameter(date_parameter_1.name)
 
-	# Filter Control
-
 	# Calculated Fields
 	calculated_field_1 = CalculatedField("SaaS-Sales.csv", "{Sales} - {Profit}", "Cost")
 
@@ -41,7 +38,6 @@ def main():
 
 	sheet_2 = Sheet('sheet2', name = "AnyCompany Sales - Freeform Layout")
 	sheet_2.set_freeform_layout()
-
 
 	# Parameter Controls
 	parameter_date_control_1 = ParameterDateTimePickerControl("id1234", date_parameter_1.name, "Date")
@@ -97,7 +93,6 @@ def main():
 	table_1.add_field_sort("Sales", "DESC")
 	table_1.add_title("VISIBLE","PlainText","Product Metrics Table")
 
-
 	# Visuals in Sheet 2
 	barchart_3 = BarChartVisual('barchart3')
 	barchart_3.set_bars_arrangement('CLUSTERED')
@@ -145,7 +140,6 @@ def main():
 	sheet_2.add_freeform_layout_element(linechart_3, "300px","600px","0px","0px")
 	sheet_2.add_freeform_layout_element(barchart_3, "300px","600px","600px","0px")
 
-
 	# Next, add all sheets to the analysis definition object
 	analysis_definition.add_sheets([sheet_1, sheet_2])
 	analysis_definition.add_parameters([date_parameter_1, integer_parameter_1])
@@ -155,6 +149,7 @@ def main():
 	# Next, add the analysis definition object to the analysis object
 	analysis_1.add_definition(analysis_definition)
 
+	# Finally, compile everything together into a single JSON file.
 	analysis_json = analysis_1.compile()
 
 	# When calling this code directly from Lambda, you will want to 1) import boto3, 2) make sure your Lambda function has the right permissions, and 
