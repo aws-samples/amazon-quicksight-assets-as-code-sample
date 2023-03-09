@@ -7,7 +7,7 @@ Currently, these APIs (*DescribeAnalysisDefinition, DescribeTemplateDefinition, 
 
 **With complex dashboards containing many resources, however, navigating through nested JSON code can be difficult to maintain. This code sample takes Assets-as-Code to the next level and demonstrates a way to declare dashboard resources (sheets, visuals, parameters, etc) as intuitive Python code.**
 
-*Disclaimer: This code sample is not exhaustive and does not support all QuickSight resources and visual types. The purpose of this sample is to demonstrate the possibilities you can unlock using assets-as-code.*
+:no good: *Disclaimer: This code sample is not exhaustive and does not support all QuickSight resources and visual types. The purpose of this sample is to demonstrate the possibilities you can unlock using assets-as-code.*
 ## Example
 
 ### Output
@@ -42,7 +42,7 @@ sheet_1.add_grid_layout_element(table_1, 13, 10, 13, 10)
 sheet_1.add_grid_layout_element(parameter_date_control_1, 7, 3, 26, 0)
 ```
 Once you are done defining your resources, the code sample will package all of your resources into a single JSON object accepted by QuickSight. Essentially, you can do anything you would do inside the QuickSight console - but instead of dragging and dropping, you can declare each step as code...pretty cool!
-## How it works
+## :gear: How it works
 
 The repo contains three main constructs - 1) **quicksight_assets_class.py**, 2) **create_analysis.py**, and 3) **asset_definition.json**.
 
