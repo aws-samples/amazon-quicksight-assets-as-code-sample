@@ -10,8 +10,14 @@ Currently, these APIs (*DescribeAnalysisDefinition, DescribeTemplateDefinition, 
 *Disclaimer: This code sample is not exhaustive and does not support all QuickSight resources and visual types. The purpose of this sample is to demonstrate the possibilities you can unlock using assets-as-code.*
 ## Example
 
+### Output
+
+The Analysis seen below was programmatically created without touching the QuickSight console. It contains features like bar charts, line charts, tables, conditional formatting, filters, and parameters.
+
+![Dashboard](img/Dashboard.png)
+
 ### Visuals
-For example, to create a new Line Chart object, you can simply call the below line of code.
+To create a new Line Chart object, you can simply call the below line of code.
 ```
 linechart_1 = LineChartVisual(visual_id = 'linechart1')
 ```
