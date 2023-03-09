@@ -37,7 +37,7 @@
                         "Filters": [
                               {
                                     "CategoryFilter": {
-                                          "FilterId": "asdgasg",
+                                          "FilterId": "productfilter1",
                                           "Column": {
                                                 "DataSetIdentifier": "SaaS-Sales.csv",
                                                 "ColumnName": "Product"
@@ -75,7 +75,7 @@
                         "Filters": [
                               {
                                     "TimeRangeFilter": {
-                                          "FilterId": "time_range_filter_1",
+                                          "FilterId": "timerangefilter1",
                                           "Column": {
                                                 "DataSetIdentifier": "SaaS-Sales.csv",
                                                 "ColumnName": "Order Date"
@@ -179,7 +179,7 @@
                                     }
                               }
                         ],
-                        "Name": "AnyCompany Sales",
+                        "Name": "AnyCompany Sales - Grid Layout",
                         "ParameterControls": [
                               {
                                     "DateTimePicker": {
@@ -588,7 +588,7 @@
                                                                                                       "Color": "#DE3E00"
                                                                                                 },
                                                                                                 {
-                                                                                                      "GradientOffset": 0.0,
+                                                                                                      "GradientOffset": 100.0,
                                                                                                       "DataValue": 200000.0,
                                                                                                       "Color": "#BADF2D"
                                                                                                 }
@@ -614,7 +614,7 @@
                                                                                                       "Color": "#DE3E00"
                                                                                                 },
                                                                                                 {
-                                                                                                      "GradientOffset": 50,
+                                                                                                      "GradientOffset": 100.0,
                                                                                                       "DataValue": 0.5,
                                                                                                       "Color": "#BADF2D"
                                                                                                 }
@@ -647,29 +647,51 @@
                                                       {
                                                             "ElementId": "linechart3",
                                                             "ElementType": "VISUAL",
-                                                            "Height": "800px",
+                                                            "Height": "300px",
                                                             "Width": "600px",
-                                                            "XAxisLocation": "450px",
+                                                            "XAxisLocation": "0px",
                                                             "YAxisLocation": "0px"
                                                       },
                                                       {
                                                             "ElementId": "barchart3",
                                                             "ElementType": "VISUAL",
-                                                            "Height": "600px",
+                                                            "Height": "300px",
                                                             "Width": "600px",
-                                                            "XAxisLocation": "0px",
-                                                            "YAxisLocation": "800px"
+                                                            "XAxisLocation": "600px",
+                                                            "YAxisLocation": "0px"
                                                       }
                                                 ]
                                           }
                                     }
                               }
                         ],
-                        "Name": "costs",
+                        "Name": "AnyCompany Sales - Freeform Layout",
                         "Visuals": [
                               {
                                     "BarChartVisual": {
                                           "VisualId": "barchart3",
+                                          "Actions": [
+                                                {
+                                                      "ActionOperations": [
+                                                            {
+                                                                  "FilterOperation": {
+                                                                        "SelectedFieldsConfiguration": {
+                                                                              "SelectedFieldOptions": "ALL_FIELDS"
+                                                                        },
+                                                                        "TargetVisualsConfiguration": {
+                                                                              "SameSheetTargetVisualConfiguration": {
+                                                                                    "TargetVisualOptions": "ALL_VISUALS"
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            }
+                                                      ],
+                                                      "CustomActionId": "quick_filter_action_2",
+                                                      "Name": "Quick Filter",
+                                                      "Trigger": "DATA_POINT_CLICK",
+                                                      "Status": "ENABLED"
+                                                }
+                                          ],
                                           "ChartConfiguration": {
                                                 "FieldWells": {
                                                       "BarChartAggregatedFieldWells": {
@@ -700,8 +722,25 @@
                                                             ]
                                                       }
                                                 },
-                                                "BarsArrangement": "STACKED",
-                                                "Orientation": "HORIZONTAL"
+                                                "BarsArrangement": "CLUSTERED",
+                                                "Orientation": "HORIZONTAL",
+                                                "CategoryAxis": {
+                                                      "ScrollbarOptions": {
+                                                            "Visibility": "HIDDEN"
+                                                      }
+                                                }
+                                          },
+                                          "Title": {
+                                                "Visibility": "VISIBLE",
+                                                "FormatText": {
+                                                      "PlainText": "Sum of Sales by Product"
+                                                }
+                                          },
+                                          "Subtitle": {
+                                                "Visibility": "VISIBLE",
+                                                "FormatText": {
+                                                      "PlainText": "Use this visual to drill down into specific products."
+                                                }
                                           }
                                     }
                               },
@@ -713,12 +752,13 @@
                                                       "LineChartAggregatedFieldWells": {
                                                             "Category": [
                                                                   {
-                                                                        "CategoricalDimensionField": {
-                                                                              "FieldId": "Product",
+                                                                        "DateDimensionField": {
+                                                                              "FieldId": "Order Date",
                                                                               "Column": {
-                                                                                    "ColumnName": "Product",
+                                                                                    "ColumnName": "Order Date",
                                                                                     "DataSetIdentifier": "SaaS-Sales.csv"
-                                                                              }
+                                                                              },
+                                                                              "DateGranularity": "MONTH"
                                                                         }
                                                                   }
                                                             ],
@@ -734,11 +774,46 @@
                                                                                     "SimpleNumericalAggregation": "SUM"
                                                                               }
                                                                         }
+                                                                  },
+                                                                  {
+                                                                        "NumericalMeasureField": {
+                                                                              "FieldId": "Profit",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Profit",
+                                                                                    "DataSetIdentifier": "SaaS-Sales.csv"
+                                                                              },
+                                                                              "AggregationFunction": {
+                                                                                    "SimpleNumericalAggregation": "SUM"
+                                                                              }
+                                                                        }
+                                                                  },
+                                                                  {
+                                                                        "NumericalMeasureField": {
+                                                                              "FieldId": "Cost",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Cost",
+                                                                                    "DataSetIdentifier": "SaaS-Sales.csv"
+                                                                              },
+                                                                              "AggregationFunction": {
+                                                                                    "SimpleNumericalAggregation": "SUM"
+                                                                              }
+                                                                        }
                                                                   }
                                                             ]
                                                       }
                                                 },
+                                                "XAxisDisplayOptions": {
+                                                      "ScrollbarOptions": {
+                                                            "Visibility": "HIDDEN"
+                                                      }
+                                                },
                                                 "Type": "LINE"
+                                          },
+                                          "Title": {
+                                                "Visibility": "VISIBLE",
+                                                "FormatText": {
+                                                      "PlainText": "Sales vs Profit over time"
+                                                }
                                           }
                                     }
                               }

@@ -6,19 +6,13 @@ import boto3
 ###################################################################
 
 def main():
-	# #Analysis
-	# analysis_1 = Analysis('<your-aws-account-id>','analysis1','Assets as Code - Sample Analysis')
+	#Analysis
+	analysis_1 = Analysis('<your-aws-account-id>','analysis1','Assets as Code - Sample Analysis')
 
-	# #Analysis Definition
-	# analysis_definition = Definition([{"DataSetArn":"<your-dataset-arn>","Identifier":"<your-dataset-identifier>"}])
-	# analysis_definition.set_analysis_default()
-
-	# TODO REMOVE THIS
-	analysis_1 = Analysis('752669751623','analysis1','Assets as Code - Sample Analysis')
-
-	# Analysis Definition
-	analysis_definition = Definition([{"DataSetArn":"arn:aws:quicksight:us-east-1:752669751623:dataset/3a47da5a-79e6-43dc-94a3-6e01b8603b6a","Identifier":"SaaS-Sales.csv"}])
+	#Analysis Definition
+	analysis_definition = Definition([{"DataSetArn":"<your-dataset-arn>","Identifier":"<your-dataset-identifier>"}])
 	analysis_definition.set_analysis_default()
+
 
 	# Parameters
 	date_parameter_1 = DateTimeParameter("Date")
@@ -28,10 +22,10 @@ def main():
 	integer_parameter_1 = IntegerParameter("digit","MULTI_VALUED")
 
 	# Filters
-	product_filter = CategoryFilter("asdgasg", "Product", 'SaaS-Sales.csv')
+	product_filter = CategoryFilter("productfilter1", "Product", 'SaaS-Sales.csv')
 	product_filter.add_filter_list_configuration('CONTAINS',['Alchemy','Big Ol Database', 'Data Smasher', 'OneView', 'ChatBot Plugin'])
 
-	date_filter = TimeRangeFilter("time_range_filter_1", "Order Date", 'SaaS-Sales.csv', "ALL_VALUES")
+	date_filter = TimeRangeFilter("timerangefilter1", "Order Date", 'SaaS-Sales.csv', "ALL_VALUES")
 	date_filter.add_min_value_parameter(date_parameter_1.name)
 
 	# Filter Control
@@ -40,12 +34,12 @@ def main():
 	calculated_field_1 = CalculatedField("SaaS-Sales.csv", "{Sales} - {Profit}", "Cost")
 
 	# Sheet
-	sheet_1 = Sheet('sheet1', name = "AnyCompany Sales")
+	sheet_1 = Sheet('sheet1', name = "AnyCompany Sales - Grid Layout")
 	sheet_1.set_title("AnyCompany Sales")
 	sheet_1.set_description("This dashboard shows YTD Sales on AnyCompany Products. All the assets in this dashboard (Visuals, Parameters, Filters, Actions, etc.) were programmatically created using assets-as-code.")
 	sheet_1.set_grid_layout("FIXED", "1600px")
 
-	sheet_2 = Sheet('sheet2', name = "costs")
+	sheet_2 = Sheet('sheet2', name = "AnyCompany Sales - Freeform Layout")
 	sheet_2.set_freeform_layout()
 
 
@@ -53,7 +47,7 @@ def main():
 	parameter_date_control_1 = ParameterDateTimePickerControl("id1234", date_parameter_1.name, "Date")
 	parameter_date_control_1.set_title_font(font_decoration="UNDERLINE")
 
-	# Visuals
+	# Visuals in Sheet 1
 	barchart_1 = BarChartVisual('barchart1')
 	barchart_1.set_bars_arrangement('CLUSTERED')
 	barchart_1.set_orientation('VERTICAL')
@@ -72,7 +66,6 @@ def main():
 	barchart_2.set_scroll_bar_visibility("HIDDEN")
 	barchart_2.add_title("VISIBLE","PlainText","Average Profit by Product")
 
-
 	linechart_1 = LineChartVisual('linechart1')
 	linechart_1.set_type('LINE')
 	linechart_1.add_date_dimension_field('Order Date','SaaS-Sales.csv', date_granularity = "MONTH")
@@ -81,17 +74,6 @@ def main():
 	linechart_1.add_numerical_measure_field('Cost','SaaS-Sales.csv','SUM')
 	linechart_1.add_title("VISIBLE","PlainText","Sales vs Profit over time")
 	linechart_1.set_scroll_bar_visibility("HIDDEN")
-
-	barchart_3 = BarChartVisual('barchart3')
-	barchart_3.set_bars_arrangement('STACKED')
-	barchart_3.set_orientation('HORIZONTAL')
-	barchart_3.add_categorical_dimension_field('Product','SaaS-Sales.csv')
-	barchart_3.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
-
-	linechart_3 = LineChartVisual('linechart3')
-	linechart_3.set_type('LINE')
-	linechart_3.add_categorical_dimension_field('Product','SaaS-Sales.csv')
-	linechart_3.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
 
 	table_1 = TableVisual('table1')
 	table_1.add_categorical_dimension_field('Product','SaaS-Sales.csv')
@@ -106,15 +88,35 @@ def main():
 	table_1.add_icon_conditional_formatting('Sales','SUM({Sales}) < \"BOTTOM_25_PERCENT\"', icon = 'ONE_BAR', color = '#0251D3')
 	table_1.add_gradient_text_conditional_formatting('Sales', 'SUM({Sales})', 
 		[{ "GradientOffset": 0.0,"DataValue": 0.0,"Color": "#DE3E00"}, 
-		{ "GradientOffset": 0.0,"DataValue": 200000.0,"Color": "#BADF2D"}])
+		{ "GradientOffset": 100.0,"DataValue": 200000.0,"Color": "#BADF2D"}])
 	table_1.add_gradient_text_conditional_formatting('Discount', 'AVG({Discount})', 
 		[{ "GradientOffset": 0.0,"DataValue": 0.0,"Color": "#DE3E00"},
-		{ "GradientOffset": 50,"DataValue": 0.5,"Color": "#BADF2D"}])
+		{ "GradientOffset": 100.0,"DataValue": 0.5,"Color": "#BADF2D"}])
 	table_1.set_cell_border_type('UniformBorder', style = 'NONE')
 	table_1.set_header_border_type('InnerHorizontal', thickness=2)
 	table_1.add_field_sort("Sales", "DESC")
 	table_1.add_title("VISIBLE","PlainText","Product Metrics Table")
 
+
+	# Visuals in Sheet 2
+	barchart_3 = BarChartVisual('barchart3')
+	barchart_3.set_bars_arrangement('CLUSTERED')
+	barchart_3.set_orientation('HORIZONTAL')
+	barchart_3.add_categorical_dimension_field('Product','SaaS-Sales.csv')
+	barchart_3.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
+	barchart_3.add_title("VISIBLE","PlainText","Sum of Sales by Product")
+	barchart_3.add_subtitle("VISIBLE","PlainText","Use this visual to drill down into specific products.")
+	barchart_3.set_scroll_bar_visibility("HIDDEN")
+	barchart_3.add_filter_action("quick_filter_action_2", "Quick Filter", "DATA_POINT_CLICK", selected_field_options = "ALL_FIELDS", target_visual_options= "ALL_VISUALS")
+
+	linechart_3 = LineChartVisual('linechart3')
+	linechart_3.set_type('LINE')
+	linechart_3.add_date_dimension_field('Order Date','SaaS-Sales.csv', date_granularity = "MONTH")
+	linechart_3.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
+	linechart_3.add_numerical_measure_field('Profit','SaaS-Sales.csv','SUM')
+	linechart_3.add_numerical_measure_field('Cost','SaaS-Sales.csv','SUM')
+	linechart_3.add_title("VISIBLE","PlainText","Sales vs Profit over time")
+	linechart_3.set_scroll_bar_visibility("HIDDEN")
 
 	# Filter Group
 	filter_group_1 = FilterGroup("ALL_DATASETS", "filtergroup1")
@@ -130,6 +132,7 @@ def main():
 	# First, add all elements (visuals, parameter controls, action controls, etc) to the sheet they belong to
 	sheet_1.add_visuals([barchart_1,barchart_2,linechart_1, table_1])
 	sheet_1.add_parameter_controls([parameter_date_control_1])
+
 	sheet_2.add_visuals([barchart_3,linechart_3])
 
 	# Next, specify the layout of all the elements
@@ -139,12 +142,12 @@ def main():
 	sheet_1.add_grid_layout_element(table_1, 13, 10, 13, 10)
 	sheet_1.add_grid_layout_element(parameter_date_control_1, 7, 3, 26, 0)
 
-	sheet_2.add_freeform_layout_element(linechart_3, "800px","600px","450px","0px")
-	sheet_2.add_freeform_layout_element(barchart_3, "600px","600px","0px","800px")
+	sheet_2.add_freeform_layout_element(linechart_3, "300px","600px","0px","0px")
+	sheet_2.add_freeform_layout_element(barchart_3, "300px","600px","600px","0px")
 
 
 	# Next, add all sheets to the analysis definition object
-	analysis_definition.add_sheets([sheet_1,sheet_2])
+	analysis_definition.add_sheets([sheet_1, sheet_2])
 	analysis_definition.add_parameters([date_parameter_1, integer_parameter_1])
 	analysis_definition.add_filter_groups([filter_group_1, filter_group_2])
 	analysis_definition.add_calculated_fields([calculated_field_1])
@@ -202,10 +205,6 @@ def main():
 	with open("asset_definition.json", "w") as outfile:
 		outfile.write(file)
 	'''
-	file = json.dumps(analysis_json, indent=6)
-
-	with open("asset_definition.json", "w") as outfile:
-		outfile.write(file)
 
 if __name__ == "__main__":
 	main()

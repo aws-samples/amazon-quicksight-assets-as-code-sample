@@ -35,7 +35,7 @@ sheet_1.add_grid_layout_element(linechart_1, 13, 10, 0, 10)
 sheet_1.add_grid_layout_element(table_1, 13, 10, 13, 10)
 sheet_1.add_grid_layout_element(parameter_date_control_1, 7, 3, 26, 0)
 ```
-Once you are done defining your resources, the code sample will package all of your resources into a single JSON object accepted by QuickSight.
+Once you are done defining your resources, the code sample will package all of your resources into a single JSON object accepted by QuickSight. Essentially, you can do anything you would do inside the QuickSight console - but instead of dragging and dropping, you can declare each step as code...pretty cool!
 ## How it works
 
 The repo contains three main constructs - 1) **quicksight_assets_class.py**, 2) **create_analysis.py**, and 3) **asset_definition.json**.
@@ -57,7 +57,13 @@ The repo contains three main constructs - 1) **quicksight_assets_class.py**, 2) 
 *Note: While this is a fairly simple architecture in itself, the concept can be extended to sophisticated architectures involving CI/CD pipelines.*
 ### Calling the function using AWS CLI
 
-You can call the API using the AWS CLI as noted below.
+To call the function using AWS CLI, we first want to run the create_analysis.py file to generate the assets_definition.json file.
+
+```
+python create_analysis.py
+```
+
+Then, you can call the API using the AWS CLI as noted below.
 ```
 aws quicksight update-analysis --cli-input-json file://asset-definition.json --region us-east-1 --profile [your-aws-profile-here]
 ```

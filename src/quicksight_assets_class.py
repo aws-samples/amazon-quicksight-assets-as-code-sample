@@ -1,5 +1,3 @@
-import json
-
 class Analysis():
 	def __init__(self, aws_account_id, analysis_id, analysis_name):
 		# The ID of the AWS account where you are creating an analysis.
@@ -1470,7 +1468,6 @@ class TextBox():
 		return self.json
 
 # Recursive function to remove parameters with empty values from dictionary object
-# This functions is run only once when you call analysis.compile()
 def clean_dict(input):
     if type(input) is dict:
         return dict((key, clean_dict(value)) for key, value in input.items() if (value or value == 0) and clean_dict(value) not in [{},[],""])
