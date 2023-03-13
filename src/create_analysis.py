@@ -46,7 +46,7 @@ def main():
 	# Visuals in Sheet 1
 	barchart_1 = BarChartVisual('barchart1')
 	barchart_1.set_bars_arrangement('CLUSTERED')
-	barchart_1.set_orientation('VERTICAL')
+	barchart_1.set_orientation('HORIZONTAL')
 	barchart_1.add_categorical_dimension_field('Product','SaaS-Sales.csv')
 	barchart_1.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM')
 	barchart_1.add_title("VISIBLE","PlainText","Sum of Sales by Product")
@@ -200,6 +200,5 @@ def main():
 	with open("asset_definition.json", "w") as outfile:
 		outfile.write(file)
 	'''
-
 if __name__ == "__main__":
 	main()

@@ -32,8 +32,11 @@ class Analysis():
 		# The ARN for the theme to apply to the analysis that you're creating.
 		self.theme_arn = ""
 
-	def add_tags(self, tag_key, tag_value):
-		self.tags.append({tag_key,tag_value})
+	def add_tag(self, tag_key, tag_value):
+		self.tags.append({"Key": tag_key,"Value": tag_value})
+
+	def add_permission(self, actions, principal):
+		self.permissions.append({"Actions": actions, "Principal": principal})
 
 	def add_definition(self, definition):
 		self.definition = definition.compile()
