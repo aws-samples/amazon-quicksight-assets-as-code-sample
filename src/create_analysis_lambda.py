@@ -1,11 +1,10 @@
-from quicksight_assets_class import *
 import json
 import boto3
-###################################################################
-### This where we are going to create dashboard objects as code ###
-###################################################################
+from quicksight_assets_class import *
 
-def main():
+client = boto3.client('quicksight')
+
+def lambda_handler(event, context):
 	#Analysis
 	analysis_1 = Analysis('<your-aws-account-id>','analysis1','Assets as Code - Sample Analysis')
 
@@ -155,8 +154,6 @@ def main():
 	# When calling this code directly from Lambda, you will want to 1) import boto3, 2) make sure your Lambda function has the right permissions, and 
 	# 3) pass the values directly to the API.
 	'''
-	client = boto3.client('quicksight')
-
 	# Creating a new analysis
 	response = client.create_analysis(
 		AwsAccountId = analysis_json["AwsAccountId"],
@@ -174,9 +171,11 @@ def main():
 		# # Remove if not used
 		# ThemeArn = analysis_json["ThemeArn"]
 		)
-
+	'''
+		
+	'''
 	# Updating an existing analysis
-	response = client.update_analysis(
+	response = client.create_analysis(
 		AwsAccountId = analysis_json["AwsAccountId"],
 		AnalysisId = analysis_json["AnalysisId"],
 		Definition = analysis_json["Definition"],
@@ -191,14 +190,3 @@ def main():
 
 	return response
 	'''
-
-	# When calling this code from the AWS CLI, you will want to dump the dictionary into an output JSON file (assets_definition.json).
-	# This assets_definition.json file will be referenced as the definition file when you call the API through CLI commands.
-	'''
-	file = json.dumps(analysis_json, indent=6)
-
-	with open("asset_definition.json", "w") as outfile:
-		outfile.write(file)
-	'''
-if __name__ == "__main__":
-	main()
