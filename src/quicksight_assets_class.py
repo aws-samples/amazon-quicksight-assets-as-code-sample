@@ -388,6 +388,7 @@ class Parameter():
 		self.custom_value = custom_value
 		# RECOMMENDED_VALUE | NULL
 		self.value_when_unset_option = value_when_unset_option
+
 class DateTimeParameter(Parameter):
 	def __init__(self, name):
 		Parameter.__init__(self, name)
@@ -544,6 +545,7 @@ class ParameterDateTimePickerControl(ParameterControl):
 			}
 		}
 		return self.json
+	
 class ParameterDropDownControl(ParameterControl):
 	def __init__(self, parameter_control_id, parameter, title):
 		ParameterControl.__init__(self, parameter_control_id, parameter, title)
@@ -590,6 +592,7 @@ class ParameterDropDownControl(ParameterControl):
 			}
 		}
 		return self.json
+	
 class ParameterListControl(ParameterControl):
 	def __init__(self, parameter_control_id, parameter, title):
 		ParameterControl.__init__(self, parameter_control_id, parameter, title)
@@ -643,6 +646,7 @@ class ParameterListControl(ParameterControl):
 			}
 		}
 		return self.json
+	
 class ParameterSliderControl(ParameterControl):
 	def __init__(self, parameter_control_id, parameter, title, maximum_value, minimum_value, step_size):
 		ParameterControl.__init__(self, parameter_control_id, parameter, title)
@@ -679,6 +683,7 @@ class ParameterSliderControl(ParameterControl):
 			}
 		}
 		return self.json
+	
 class ParameterTextAreaControl(ParameterControl):
 	def __init__(self, parameter_control_id, parameter, title):
 		ParameterControl.__init__(self, parameter_control_id, parameter, title)
@@ -715,6 +720,7 @@ class ParameterTextAreaControl(ParameterControl):
 			}
 		}
 		return self.json
+	
 class ParameterTextFieldControl(ParameterControl):
 	def __init__(self, parameter_control_id, parameter, title):
 		ParameterControl.__init__(self, parameter_control_id, parameter, title)
@@ -846,6 +852,7 @@ class CategoryFilter(Filter):
 			}
 		}
 		return self.json
+	
 class NumericEqualityFilter(Filter):
 	def __init__(self, filter_id, column_name, data_set_identifier, match_operator, null_option):
 		Filter.__init__(self, filter_id, column_name, data_set_identifier)
@@ -1003,13 +1010,15 @@ class Visual():
 		# Available in TableVisual, etc.
 		self.conditional_formatting = {}
 
+		# Available in Scatterplot, Points on Map, Tree Map
+		self.sizes = []
 
 		self.category = []
 		self.values = []
 		self.colors = []
 		self.small_multiples = []
 
-		self.group_by = []
+		self.groups = []
 
 	def add_title(self, visibility, text_format, text):
 		self.title = {
@@ -1076,6 +1085,7 @@ class Visual():
 					"HierarchyId": hierarchy_id
 				}
 			})
+
 	def add_numerical_measure_field(self, column_name, data_set_identifier, aggregation_function = None, 
 				 currency_decimal_places = '', currency_number_scale = '', currency_prefix = '', currency_suffix = '',currency_symbol = '',
 				 percentage_suffix = ''):
@@ -1110,6 +1120,64 @@ class Visual():
 					}
 				})
 	
+	def add_calculated_measure_field(self, expression, field_id):
+		self.values.append(
+				{
+					"CalculatedMeasureField": {
+						"FieldId": field_id,
+						"Expression": expression
+					}
+				})
+		
+	def add_date_measure_field(self, column_name, data_set_identifier, aggregation_function = None):
+		self.values.append(
+				{
+					"DateMeasureField": {
+						"FieldId": column_name,
+						"Column": {
+							"ColumnName": column_name,
+							"DataSetIdentifier": data_set_identifier
+						},
+						"AggregationFunction": aggregation_function
+					}
+				})
+
+	def add_categorical_measure_field(self, column_name, data_set_identifier, aggregation_function = None):
+		self.values.append(
+				{
+					"CategoricalMeasureField": {
+						"FieldId": column_name,
+						"Column": {
+							"ColumnName": column_name,
+							"DataSetIdentifier": data_set_identifier
+						},
+						"AggregationFunction": aggregation_function
+					}
+				})
+		
+
+
+	def add_column_hierarchy(self, hierarchy_id, column_names, data_set_identifier):
+		self.column_hierarchies.append(
+			{
+				"ExplicitHierarchy": {
+					"HierarchyId": hierarchy_id,
+					"Columns": [],
+					"DrillDownFilters": []
+				}
+			}
+		)
+
+		for column_name in column_names:
+			self.column_hierarchies[0]["ExplicitHierarchy"]["Columns"].append(
+				{
+					"DataSetIdentifier": data_set_identifier,
+					"ColumnName": column_name
+				}
+			)
+
+		self.category[0]["CategoricalDimensionField"]["HierarchyId"] = hierarchy_id
+
 	def add_filter_action(self,custom_action_id, action_name, trigger, status = "ENABLED", selected_field_options = "", selected_fields = [], target_visual_options = [], target_visuals = []):
 		self.actions.append({
 			"ActionOperations": [
@@ -1133,6 +1201,7 @@ class Visual():
 			"Trigger": trigger,
 			"Status": status
 		})
+
 class BarChartVisual(Visual):
 	def __init__(self, visual_id):
 		Visual.__init__(self, visual_id)
@@ -1195,6 +1264,7 @@ class BarChartVisual(Visual):
 		}
 
 		return self.json
+	
 class LineChartVisual(Visual):
 	def __init__(self, visual_id):
 		Visual.__init__(self,visual_id)
@@ -1249,6 +1319,7 @@ class LineChartVisual(Visual):
 		}
 
 		return self.json
+	
 class TableVisual(Visual):
 	def __init__(self, visual_id):
 		Visual.__init__(self,visual_id)
@@ -1418,6 +1489,7 @@ class TableVisual(Visual):
 		}
 
 		return self.json
+	
 class PivotTableVisual(Visual):
 	def __init__(self, visual_id):
 		Visual.__init__(self,visual_id)
@@ -1456,6 +1528,775 @@ class PivotTableVisual(Visual):
 						"Expression": expression
 					}
 				})
+
+class KPIVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+		self.target_values = []
+		self.trend_groups = []
+
+	def compile(self):
+		self.json = {
+			"KPIVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+
+						"TargetValues": self.target_values,
+						"TrendGroups": self.trend_groups,
+						"Values": self.values
+
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+
+class PieChartVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+		# The option for define the arc of the chart shape. Valid values are as follows: 
+		# WHOLE - A pie chart | SMALL- A small-sized donut chart | MEDIUM- A medium-sized donut chart | LARGE- A large-sized donut chart
+		self.donut_type = ""
+
+	def set_donut_type(self, donut_type):
+		self.donut_type = donut_type
+
+	def compile(self):
+		self.json = {
+			"PieChartVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"PieChartAggregatedFieldWells": {
+							"Category": self.category,
+							"Values": self.values,
+							"SmallMultiples": self.small_multiples
+						}
+					},
+					"DonutOptions": {
+						"ArcOptions": {
+							"ArcThickness": self.donut_type
+						}
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+	
+class ScatterPlotVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+		self.x_axis = []
+		self.y_axis = []
+
+
+	def compile(self):
+		self.json = {
+			"ScatterPlotVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"ScatterPlotCategoricallyAggregatedFieldWells": {
+							"Category": self.category
+						},
+						"ScatterPlotUnaggregatedFieldWells": {
+							"Category": self.category
+						}
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+
+class TreeMapVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+	def add_group_categorical_dimension_field(self, column_name, data_set_identifier):
+		self.groups.append(
+			{
+				"CategoricalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					}
+				}
+			})
+
+	def add_group_date_dimension_field(self, column_name, data_set_identifier, date_granularity = "", date_time_format = "", null_string = ""):
+		self.groups.append(
+			{
+				"DateDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"DateGranularity": date_granularity,
+					"FormatConfiguration": {
+						"DateTimeFormat": date_time_format,
+						"NullValueFormatConfiguration": {
+							"NullString": null_string
+						},
+						"NumericFormatConfiguration": {}
+					}
+				}
+			})
+
+	def add_group_numerical_dimension_field(self, column_name, data_set_identifier, hierarchy_id = ""):
+		self.groups.append(
+			{
+				"NumericalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"NumberFormatConfiguration": {
+						"CurrencyDisplayFormatConfiguration": {},
+						"NumberDisplayFormatConfiguration": {},
+						"PercentageDisplayFormatConfiguration": {}
+					},
+					"HierarchyId": hierarchy_id
+				}
+			})
+
+	def add_color_numerical_measure_field(self, column_name, data_set_identifier, aggregation_function = None, 
+				 currency_decimal_places = '', currency_number_scale = '', currency_prefix = '', currency_suffix = '',currency_symbol = '',
+				 percentage_suffix = ''):
+		self.colors.append(
+				{
+					"NumericalMeasureField": {
+						"FieldId": column_name,
+						"Column": {
+							"ColumnName": column_name,
+							"DataSetIdentifier": data_set_identifier
+						},
+						"AggregationFunction": {
+							"SimpleNumericalAggregation": aggregation_function
+						},
+						"FormatConfiguration": {
+							"FormatConfiguration": {
+								"CurrencyDisplayFormatConfiguration": {
+									"DecimalPlacesConfiguration": {
+										"DecimalPlaces": currency_decimal_places
+									},
+									"NumberScale": currency_number_scale,
+									"Prefix": currency_prefix,
+									"Suffix": currency_suffix,
+									"Symbol": currency_symbol
+								},
+								"NumberDisplayFormatConfiguration": {},
+								"PercentageDisplayFormatConfiguration": {
+									"Suffix": percentage_suffix
+								}
+							}
+						}
+					}
+				})
+		
+	def add_color_categorical_measure_field(self, column_name, data_set_identifier, aggregation_function = None):
+		self.colors.append(
+				{
+					"CategoricalMeasureField": {
+						"FieldId": column_name,
+						"Column": {
+							"ColumnName": column_name,
+							"DataSetIdentifier": data_set_identifier
+						},
+						"AggregationFunction": aggregation_function
+					}
+				})
+		
+	def add_color_date_dimension_field(self, column_name, data_set_identifier, aggregation_function = "", date_time_format = "", null_string = ""):
+		self.colors.append(
+			{
+				"DateDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"AggregationFunction": aggregation_function,
+					"FormatConfiguration": {
+						"DateTimeFormat": date_time_format,
+						"NullValueFormatConfiguration": {
+							"NullString": null_string
+						},
+						"NumericFormatConfiguration": {}
+					}
+				}
+			})
+		
+	def add_size_numerical_measure_field(self, column_name, data_set_identifier, aggregation_function = None, 
+				 currency_decimal_places = '', currency_number_scale = '', currency_prefix = '', currency_suffix = '',currency_symbol = '',
+				 percentage_suffix = ''):
+		self.sizes.append(
+				{
+					"NumericalMeasureField": {
+						"FieldId": column_name,
+						"Column": {
+							"ColumnName": column_name,
+							"DataSetIdentifier": data_set_identifier
+						},
+						"AggregationFunction": {
+							"SimpleNumericalAggregation": aggregation_function
+						},
+						"FormatConfiguration": {
+							"FormatConfiguration": {
+								"CurrencyDisplayFormatConfiguration": {
+									"DecimalPlacesConfiguration": {
+										"DecimalPlaces": currency_decimal_places
+									},
+									"NumberScale": currency_number_scale,
+									"Prefix": currency_prefix,
+									"Suffix": currency_suffix,
+									"Symbol": currency_symbol
+								},
+								"NumberDisplayFormatConfiguration": {},
+								"PercentageDisplayFormatConfiguration": {
+									"Suffix": percentage_suffix
+								}
+							}
+						}
+					}
+				})
+		
+	def add_size_categorical_measure_field(self, column_name, data_set_identifier, aggregation_function = None):
+		self.sizes.append(
+				{
+					"CategoricalMeasureField": {
+						"FieldId": column_name,
+						"Column": {
+							"ColumnName": column_name,
+							"DataSetIdentifier": data_set_identifier
+						},
+						"AggregationFunction": aggregation_function
+					}
+				})
+		
+	def add_size_date_dimension_field(self, column_name, data_set_identifier, aggregation_function = "", date_time_format = "", null_string = ""):
+		self.sizes.append(
+			{
+				"DateDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"AggregationFunction": aggregation_function,
+					"FormatConfiguration": {
+						"DateTimeFormat": date_time_format,
+						"NullValueFormatConfiguration": {
+							"NullString": null_string
+						},
+						"NumericFormatConfiguration": {}
+					}
+				}
+			})
+		
+	def compile(self):
+		self.json = {
+			"TreeMapVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"TreeMapAggregatedFieldWells": {
+							"Colors": self.colors,
+							"Groups": self.groups,
+							"Sizes": self.sizes
+						}
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+
+class WaterfallVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+		self.breakdowns = []
+
+	def add_breakdown_categorical_dimension_field(self, column_name, data_set_identifier):
+		self.breakdowns.append(
+			{
+				"CategoricalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					}
+				}
+			})
+
+	def add_breakdown_date_dimension_field(self, column_name, data_set_identifier, date_granularity = "", date_time_format = "", null_string = ""):
+		self.breakdowns.append(
+			{
+				"DateDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"DateGranularity": date_granularity,
+					"FormatConfiguration": {
+						"DateTimeFormat": date_time_format,
+						"NullValueFormatConfiguration": {
+							"NullString": null_string
+						},
+						"NumericFormatConfiguration": {}
+					}
+				}
+			})
+
+	def add_breakdown_numerical_dimension_field(self, column_name, data_set_identifier, hierarchy_id = ""):
+		self.breakdowns.append(
+			{
+				"NumericalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"NumberFormatConfiguration": {
+						"CurrencyDisplayFormatConfiguration": {},
+						"NumberDisplayFormatConfiguration": {},
+						"PercentageDisplayFormatConfiguration": {}
+					},
+					"HierarchyId": hierarchy_id
+				}
+			})
+
+	def compile(self):
+		self.json = {
+			"WaterfallVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"WaterfallChartAggregatedFieldWells": {
+							"Breakdowns": self.breakdowns,
+							"Categories": self.category,
+							"Values": self.values
+						}
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+	
+class FilledMapVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+		self.geospatial = []
+	
+	def add_geospatial_categorical_dimension_field(self, column_name, data_set_identifier):
+		self.geospatial.append(
+			{
+				"CategoricalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					}
+				}
+			})
+
+	def compile(self):
+		self.json = {
+			"FilledMapVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"FilledMapAggregatedFieldWells": {
+							"Geospatial": self.geospatial,
+							"Values": self.values
+						}
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+	
+class GeospatialMapVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+		self.geospatial = []
+	
+	def add_geospatial_categorical_dimension_field(self, column_name, data_set_identifier):
+		self.geospatial.append(
+			{
+				"CategoricalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					}
+				}
+			})
+		
+	def add_color_categorical_dimension_field(self, column_name, data_set_identifier):
+		self.colors.append(
+			{
+				"CategoricalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					}
+				}
+			})
+		
+	def add_color_date_dimension_field(self, column_name, data_set_identifier, aggregation_function = "", date_time_format = "", null_string = ""):
+		self.colors.append(
+			{
+				"DateDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"AggregationFunction": aggregation_function,
+					"FormatConfiguration": {
+						"DateTimeFormat": date_time_format,
+						"NullValueFormatConfiguration": {
+							"NullString": null_string
+						},
+						"NumericFormatConfiguration": {}
+					}
+				}
+			})
+		
+	def add_color_numerical_dimension_field(self, column_name, data_set_identifier, hierarchy_id = ""):
+		self.colors.append(
+			{
+				"NumericalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"NumberFormatConfiguration": {
+						"CurrencyDisplayFormatConfiguration": {},
+						"NumberDisplayFormatConfiguration": {},
+						"PercentageDisplayFormatConfiguration": {}
+					},
+					"HierarchyId": hierarchy_id
+				}
+			})		
+			
+	def compile(self):
+		self.json = {
+			"GeospatialMapVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"GeospatialMapAggregatedFieldWells": {
+							"Colors": self.colors,
+							"Geospatial": self.geospatial,
+							"Values": self.values
+						}
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+	
+class FunnelChartVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+	def compile(self):
+		self.json = {
+			"FunnelChartVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"FunnelChartAggregatedFieldWells": {
+							"Category": self.category,
+							"Values": self.values,
+						}
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+
+class HeatMapVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+		self.columns = []
+		self.rows = []
+
+	def add_column_categorical_dimension_field(self, column_name, data_set_identifier):
+		self.columns.append(
+			{
+				"CategoricalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					}
+				}
+			})
+		
+	def add_column_date_dimension_field(self, column_name, data_set_identifier, aggregation_function = "", date_time_format = "", null_string = ""):
+		self.columns.append(
+			{
+				"DateDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"AggregationFunction": aggregation_function,
+					"FormatConfiguration": {
+						"DateTimeFormat": date_time_format,
+						"NullValueFormatConfiguration": {
+							"NullString": null_string
+						},
+						"NumericFormatConfiguration": {}
+					}
+				}
+			})
+		
+	def add_column_numerical_dimension_field(self, column_name, data_set_identifier, hierarchy_id = ""):
+		self.columns.append(
+			{
+				"NumericalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"NumberFormatConfiguration": {
+						"CurrencyDisplayFormatConfiguration": {},
+						"NumberDisplayFormatConfiguration": {},
+						"PercentageDisplayFormatConfiguration": {}
+					},
+					"HierarchyId": hierarchy_id
+				}
+			})		
+	
+	def add_row_categorical_dimension_field(self, column_name, data_set_identifier):
+		self.rows.append(
+			{
+				"CategoricalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					}
+				}
+			})
+		
+	def add_row_date_dimension_field(self, column_name, data_set_identifier, aggregation_function = "", date_time_format = "", null_string = ""):
+		self.rows.append(
+			{
+				"DateDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"AggregationFunction": aggregation_function,
+					"FormatConfiguration": {
+						"DateTimeFormat": date_time_format,
+						"NullValueFormatConfiguration": {
+							"NullString": null_string
+						},
+						"NumericFormatConfiguration": {}
+					}
+				}
+			})
+		
+	def add_row_numerical_dimension_field(self, column_name, data_set_identifier, hierarchy_id = ""):
+		self.rows.append(
+			{
+				"NumericalDimensionField": {
+					"FieldId": column_name,
+					"Column": {
+						"ColumnName": column_name,
+						"DataSetIdentifier": data_set_identifier
+					},
+					"NumberFormatConfiguration": {
+						"CurrencyDisplayFormatConfiguration": {},
+						"NumberDisplayFormatConfiguration": {},
+						"PercentageDisplayFormatConfiguration": {}
+					},
+					"HierarchyId": hierarchy_id
+				}
+			})		
+	
+	def compile(self):
+		self.json = {
+			"HeatMapVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"HeatMapAggregatedFieldWells": {
+							"Columns": self.columns,
+							"Rows": self.rows,
+							"Values": self.values
+						}
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+	
+class BoxPlotVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+	def compile(self):
+		self.json = {
+			"BoxPlotVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"BoxPlotAggregatedFieldWells": {
+							"GroupBy": self.category,
+							"Values": self.values
+						}
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+
+class GaugeChartVisual(Visual):
+	def __init__(self, visual_id):
+		Visual.__init__(self,visual_id)
+
+		self.target_values = []
+		self.values = []
+
+	def add_target_value_calculated_measure_field(self, expression, field_id):
+		self.target_values.append(
+				{
+					"CalculatedMeasureField": {
+						"FieldId": field_id,
+						"Expression": expression
+					}
+				})
+		
+	def add_target_value_date_measure_field(self, column_name, data_set_identifier, aggregation_function = None):
+		self.target_values.append(
+				{
+					"DateMeasureField": {
+						"FieldId": column_name,
+						"Column": {
+							"ColumnName": column_name,
+							"DataSetIdentifier": data_set_identifier
+						},
+						"AggregationFunction": aggregation_function
+					}
+				})
+
+	def add_target_value_numerical_measure_field(self, column_name, data_set_identifier, aggregation_function = None, 
+				 currency_decimal_places = '', currency_number_scale = '', currency_prefix = '', currency_suffix = '',currency_symbol = '',
+				 percentage_suffix = ''):
+		self.target_values.append(
+				{
+					"NumericalMeasureField": {
+						"FieldId": column_name,
+						"Column": {
+							"ColumnName": column_name,
+							"DataSetIdentifier": data_set_identifier
+						},
+						"AggregationFunction": {
+							"SimpleNumericalAggregation": aggregation_function
+						},
+						"FormatConfiguration": {
+							"FormatConfiguration": {
+								"CurrencyDisplayFormatConfiguration": {
+									"DecimalPlacesConfiguration": {
+										"DecimalPlaces": currency_decimal_places
+									},
+									"NumberScale": currency_number_scale,
+									"Prefix": currency_prefix,
+									"Suffix": currency_suffix,
+									"Symbol": currency_symbol
+								},
+								"NumberDisplayFormatConfiguration": {},
+								"PercentageDisplayFormatConfiguration": {
+									"Suffix": percentage_suffix
+								}
+							}
+						}
+					}
+				})
+		
+	def add_target_value_categorical_measure_field(self, column_name, data_set_identifier, aggregation_function = None):
+		self.target_values.append(
+				{
+					"CategoricalMeasureField": {
+						"FieldId": column_name,
+						"Column": {
+							"ColumnName": column_name,
+							"DataSetIdentifier": data_set_identifier
+						},
+						"AggregationFunction": aggregation_function
+					}
+				})
+		
+
+	def compile(self):
+		self.json = {
+			"GaugeChartVisual":{
+				"VisualId": self.id,
+				"ChartConfiguration": {
+					"FieldWells": {
+						"TargetValues": self.target_values,
+						"Values": self.values
+					}
+				},
+				"Title": self.title,
+				"subtitle": self.subtitle
+			}
+		}
+
+		return self.json
+
 ### TEXTBOX ###
 class TextBox():
 	def __init__(self, text_box_id, content):

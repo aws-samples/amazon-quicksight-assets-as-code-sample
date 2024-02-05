@@ -93,6 +93,9 @@ def main():
 	table_1.add_field_sort("Sales", "DESC")
 	table_1.add_title("VISIBLE","PlainText","Product Metrics Table")
 
+	kpi_1 = KPIVisual('kpi1')
+	kpi_1.add_numerical_measure_field('Sales','SaaS-Sales.csv','SUM', currency_symbol="USD")
+
 	# Visuals in Sheet 2
 	barchart_3 = BarChartVisual('barchart3')
 	barchart_3.set_bars_arrangement('CLUSTERED')
@@ -125,7 +128,7 @@ def main():
 	filter_group_2.set_status("ENABLED")
 
 	# First, add all elements (visuals, parameter controls, action controls, etc) to the sheet they belong to
-	sheet_1.add_visuals([barchart_1,barchart_2,linechart_1, table_1])
+	sheet_1.add_visuals([barchart_1,barchart_2,linechart_1, table_1, kpi_1])
 	sheet_1.add_parameter_controls([parameter_date_control_1])
 
 	sheet_2.add_visuals([barchart_3,linechart_3])
@@ -135,6 +138,7 @@ def main():
 	sheet_1.add_grid_layout_element(barchart_2, 13, 10, 13, 0)
 	sheet_1.add_grid_layout_element(linechart_1, 13, 10, 0, 10)
 	sheet_1.add_grid_layout_element(table_1, 13, 10, 13, 10)
+	sheet_1.add_grid_layout_element(kpi_1, 20, 20, 20, 20)
 	sheet_1.add_grid_layout_element(parameter_date_control_1, 7, 3, 26, 0)
 
 	sheet_2.add_freeform_layout_element(linechart_3, "300px","600px","0px","0px")
@@ -200,5 +204,11 @@ def main():
 	with open("asset_definition.json", "w") as outfile:
 		outfile.write(file)
 	'''
+
+	file = json.dumps(analysis_json, indent=6)
+
+	with open("asset_definition.json", "w") as outfile:
+		outfile.write(file)
+
 if __name__ == "__main__":
 	main()

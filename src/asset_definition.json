@@ -1,11 +1,11 @@
 {
-      "AwsAccountId": "752669751623",
+      "AwsAccountId": "420887654007",
       "AnalysisId": "analysis1",
       "Name": "Assets as Code - Sample Analysis",
       "Definition": {
             "DataSetIdentifierDeclarations": [
                   {
-                        "DataSetArn": "arn:aws:quicksight:us-east-1:752669751623:dataset/3a47da5a-79e6-43dc-94a3-6e01b8603b6a",
+                        "DataSetArn": "arn:aws:quicksight:us-east-1:420887654007:dataset/5793e4cf-74e0-4b08-b6d8-552ae48aa13c",
                         "Identifier": "SaaS-Sales.csv"
                   }
             ],
@@ -159,6 +159,14 @@
                                                             "RowSpan": 10,
                                                             "ColumnIndex": 13,
                                                             "RowIndex": 10
+                                                      },
+                                                      {
+                                                            "ElementId": "kpi1",
+                                                            "ElementType": "VISUAL",
+                                                            "ColumnSpan": 20,
+                                                            "RowSpan": 20,
+                                                            "ColumnIndex": 20,
+                                                            "RowIndex": 20
                                                       },
                                                       {
                                                             "ElementId": "id1234",
@@ -631,6 +639,38 @@
                                                 "Visibility": "VISIBLE",
                                                 "FormatText": {
                                                       "PlainText": "Product Metrics Table"
+                                                }
+                                          }
+                                    }
+                              },
+                              {
+                                    "KPIVisual": {
+                                          "VisualId": "kpi1",
+                                          "ChartConfiguration": {
+                                                "FieldWells": {
+                                                      "KPIFieldWells": {
+                                                            "Values": [
+                                                                  {
+                                                                        "NumericalMeasureField": {
+                                                                              "FieldId": "Sales",
+                                                                              "Column": {
+                                                                                    "ColumnName": "Sales",
+                                                                                    "DataSetIdentifier": "SaaS-Sales.csv"
+                                                                              },
+                                                                              "AggregationFunction": {
+                                                                                    "SimpleNumericalAggregation": "SUM"
+                                                                              },
+                                                                              "FormatConfiguration": {
+                                                                                    "FormatConfiguration": {
+                                                                                          "CurrencyDisplayFormatConfiguration": {
+                                                                                                "Symbol": "USD"
+                                                                                          }
+                                                                                    }
+                                                                              }
+                                                                        }
+                                                                  }
+                                                            ]
+                                                      }
                                                 }
                                           }
                                     }

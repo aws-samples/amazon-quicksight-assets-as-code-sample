@@ -1,3 +1,5 @@
 .DS_Store
 __pycache__/
 **/AWSCLIV2.pkg
+src/create_analysis_local.py
+src/asset_definition_local.json
